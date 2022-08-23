@@ -1,0 +1,5 @@
+en:
+  activerecord:
+    attributes:
+      'pairer/board':
+        num_iterations_to_track: "Number of Iterations to Track"

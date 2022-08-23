@@ -1,0 +1,8 @@
+div style="text-align: center; padding-top: 25%"
+  - case response.status.to_s
+  - when "404"
+    h1 Page Not Found
+  - else
+    h1 Sorry, an error occured. The administrator has been notified.
+
+  .badge.badge-error = "Error #{response.status}"
