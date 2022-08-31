@@ -1,6 +1,6 @@
 span.role data-role-name=role 
   = role
 
-  span.space-left2
+  span.space-left2.delete
     = link_to board_path(@board, remove_role_name: role), data: {method: :patch, confirm: "Are you sure you want to remove '#{role}' role ?"}, title: "Delete Role", class: 'btn btn-xs btn-danger' do
       i.icon-trash

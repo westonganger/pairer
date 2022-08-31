@@ -4,6 +4,8 @@ This is a Rails app/engine to help you to easily rotate and keep track of workin
 
 Each Organization Name has many boards. Within each Board you can create people and roles. The tool will allow for automated and manually assignments of people and roles to working groups within the board.
 
+![Screenshot](/screenshot.png)
+
 ## Setup
 
 Developed as a Rails engine. So you can add to any existing app or create a brand new app with the functionality.

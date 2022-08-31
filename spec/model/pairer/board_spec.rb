@@ -32,6 +32,10 @@ RSpec.describe Pairer::Board, type: :model do
     it "deletes old untracked groups" do
       skip "TODO"
     end
+
+    it "deletes short-lived re-shuffled groups" do
+      skip "TODO"
+    end
   end
 
   context "stats" do

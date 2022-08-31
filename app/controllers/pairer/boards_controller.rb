@@ -1,14 +1,14 @@
 require_dependency "pairer/application_controller"
 
 module Pairer
-  class MainController < ApplicationController
-    before_action except: [:sign_in] do
+  class BoardsController < ApplicationController
+    before_action do
       if !signed_in?
-        redirect_to action: :sign_in
+        redirect_to sign_in_path
       end
     end
 
-    before_action :get_board, except: [:index, :new, :create, :sign_in, :sign_out]
+    before_action :get_board, except: [:index, :new, :create]
 
     def index
       if params[:password].present?
@@ -21,27 +21,6 @@ module Pairer
           render
         end
       end
-    end
-
-    def sign_in
-      if request.method == "GET"
-        if signed_in?
-          redirect_to(action: :index)
-        end
-
-      elsif request.method == "POST"
-        if Pairer.allowed_org_names.include?(params[:org_name]&.downcase)
-          session[:current_org_name] = params[:org_name].downcase
-          redirect_to(action: :index)
-        end
-      end
-    end
-
-    def sign_out
-      session.delete(:current_org_name)
-      session.delete(:current_board_id)
-      flash.notice = "Signed out"
-      redirect_to(action: :sign_in)
     end
 
     def create

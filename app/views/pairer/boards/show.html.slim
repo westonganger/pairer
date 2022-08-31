@@ -1,6 +1,5 @@
 .pull-right
   .text-right
-    button.btn.btn-default.btn-sm.space-right2 type="button" onclick=("alert('Board password is: #{@board.password}')") View Password
     button.btn.btn-default.btn-sm.space-right2 type="button" onclick=("$('.password-form').toggle()") Change Password
     = link_to "Delete Board", board_path(@board), class: "btn btn-danger btn-sm", data: {method: :delete, confirm: "Are you sure you want to delete the board?"}
 
@@ -14,10 +13,6 @@
     span.space-left2
       button.btn.btn-xs.btn-success type="submit" Update
 
-h1.space-above
-  = "Board: #{@board.name}"
-  = link_to "Shuffle", shuffle_board_path(@board), class: "btn btn-success btn-sm space-left4", data: {method: :post}
-
 = form_tag board_path(@board), method: :patch, class: 'form-inline' do
   /h3 Edit Board
 
@@ -28,7 +23,7 @@ h1.space-above
   
   div
     label Board Name
-    input.form-control.change-submit name="board[name]" value=@board.name style="width: 150px;"
+    input.form-control.change-submit name="board[name]" value=@board.name style="width: 180px;"
 
     span.space-left3
       label Group Size
@@ -39,17 +34,27 @@ h1.space-above
       input.form-control.change-submit name="board[num_iterations_to_track]" value=@board.num_iterations_to_track style="width: 50px;"
 
 .row
-  .col-sm-9
+  .col-sm-9.groups-container
     h3 
       .pull-left.space-right2 Groups
       = form_tag create_group_board_path(@board) do
-        button.btn.btn-xs.btn-success type="submit" Add
+        button.btn.btn-sm type="submit" 
+          i.icon-plus.space-right
+          span Add
+
+    .text-center.space-below3 style="margin-top: -53px;"
+      = link_to shuffle_board_path(@board), class: "btn btn-success space-left4", data: {method: :post} do
+        i.icon-refresh.space-right
+        span Shuffle
 
     table.table-bordered.table
       thead
-        th
-        th style="width: 50%" People
-        th Roles
+        th style="width: 80px;"
+          = link_to shuffle_board_path(@board), class: "btn btn-success btn-sm", data: {method: :post} do
+            i.icon-refresh.space-right
+            span Shuffle
+        th style="width: 50%; padding-left: 25px;" People
+        th style="padding-left: 25px;" Roles
       tbody
         - people_by_id = @board.people.map{|x| [x.to_param, x] }.to_h
 
@@ -59,75 +64,81 @@ h1.space-above
 
         - @board.current_groups.each do |group|
           tr
-            td
-              div
-                = link_to lock_group_board_path(@board, group_id: group), data: {method: :post}, class: 'btn btn-xs btn-default', title: "#{group.locked? ? "Unlock" : "Lock"} Group" do
+            td.text-center
+              .space-above2
+                = link_to lock_group_board_path(@board, group_id: group), data: {method: :post}, class: 'btn btn-xs btn-default group-lock-btn', title: "#{group.locked? ? "Unlock" : "Lock"} Group" do
                   i class=(group.locked? ? 'icon-lock' : 'icon-unlock')
 
-              .space-above2
-                = link_to delete_group_board_path(@board, group_id: group), data: {method: :delete, confirm: "Are you sure you want to delete this group?"}, class: 'btn btn-xs btn-danger', title: "Delete Group" do
-                  i.icon-trash
+                = link_to delete_group_board_path(@board, group_id: group), data: {method: :delete}, class: 'btn btn-xs space-left2 group-sweep-btn', title: "Sweep" do
+                  = render "pairer/shared/svg/broom"
 
-            td.person-list data-group-id=group.public_id
+            td.person-list data-group-id=group.public_id style="padding-left: 20px;"
               - group.person_ids_array.each do |person_public_id|
                 - person = people_by_id[person_public_id]
                 - if person
                   = render 'person', person: person
 
-            td.roles-list data-group-id=group.public_id
+            td.roles-list data-group-id=group.public_id style="padding-left: 20px;"
               - group.roles_array.each do |role|
                 = render 'role', role: role
 
-    h3 
+    h3.space-above5
       .pull-left Stats
       = link_to "Reset Stats and Groups", board_path(@board, clear_board: true), class: 'btn btn-danger btn-sm space-left2', data: {method: :patch}
+
     - stats = @board.stats
 
     - if stats.empty?
       p Cannot show stats with only 1 person on the board
     - else
-      ul
-        - @board.stats.each do |stat|
-          li = stat
+      table.table.table-condensed.table-bordered style="max-width: 400px;"
+        thead
+          th Pair
+          th style="width: 90px;" Pair Count
+        tbody
+          - @board.stats.each do |person_names, count|
+            tr
+              td = person_names.join(", ")
+              td.text-center = count
 
     - if Rails.env.development?
-      = "Current Groups: #{@board.current_groups.size}"
-      br
-      = "Current Groups Iteration Numbers: #{@board.current_groups.collect(&:board_iteration_number).uniq.join(", ")}"
-      br
-      = "Tracked Groups: #{@board.tracked_groups.size}"
-      br
-      = "Tracked Groups Iteration Numbers: #{@board.tracked_groups.collect(&:board_iteration_number).uniq.join(", ")}"
+      .well.space-above5
+        h4 Debug Info
 
-  .col-sm-3.well
-    h3 
-      .pull-left.space-right2 Roles
+        = "Number of Tracked Groups: #{@board.tracked_groups.size}"
+        br
+        = "Tracked Groups Iteration Numbers: #{@board.tracked_groups.collect(&:board_iteration_number).uniq.join(", ")}"
 
-      = form_tag board_path(@board), method: :patch, class: 'form-inline space-below space-left3' do
-        = text_field_tag :add_role_name, nil, placeholder: "Role Name", style: "width: 150px;", class: 'form-control'
+  .col-sm-3
+    .well.space-above3
+      h3.space-above
+        .pull-left.space-right2 Roles
 
-        span.space-left
-          button.btn.btn-sm.btn-success type="submit" Add
+        = form_tag board_path(@board), method: :patch, class: 'form-inline space-below space-left3' do
+          = text_field_tag :add_role_name, nil, placeholder: "Role Name", style: "width: 150px;", class: 'form-control'
 
-    .roles-list style="min-height: 25px;"
-      - group_roles = @board.current_groups.flat_map(&:roles_array)
-      - @board.roles_array.select{|x| group_roles.exclude?(x) }.each do |role|
-        = render 'role', role: role
+          span.space-left
+            button.btn.btn-sm type="submit" Add
 
-    h3.space-above5
-      .pull-left.space-right4 People
+      .roles-list style="min-height: 25px;"
+        - group_roles = @board.current_groups.flat_map(&:roles_array)
+        - @board.roles_array.select{|x| group_roles.exclude?(x) }.each do |role|
+          = render 'role', role: role
 
-      = form_tag create_person_board_path(@board), class: 'form-inline space-below space-left3' do
-        = text_field_tag :name, nil, placeholder: "Name", style: "width: 150px;", class: 'form-control'
+      h3.space-above5
+        .pull-left.space-right4 People
 
-        span.space-left
-          button.btn.btn-sm.btn-success type="submit" Add
+        = form_tag create_person_board_path(@board), class: 'form-inline space-below space-left3' do
+          = text_field_tag :name, nil, placeholder: "Name", style: "width: 150px;", class: 'form-control'
 
-    .person-list style="min-height: 40px;"
-      - group_person_ids = @board.current_groups.flat_map(&:person_ids_array)
+          span.space-left
+            button.btn.btn-sm type="submit" Add
 
-      - @board.people.select{|x| group_person_ids.exclude?(x.public_id) }.sort_by{|x| x.name }.each do |person|
-        = render 'person', person: person
+      .person-list style="min-height: 40px;"
+        - group_person_ids = @board.current_groups.flat_map(&:person_ids_array)
+
+        - @board.people.select{|x| group_person_ids.exclude?(x.public_id) }.sort_by{|x| x.name }.each do |person|
+          = render 'person', person: person
 
 css:
   .role, 
@@ -139,6 +150,24 @@ css:
     margin: 5px 5px;
     line-height: 40px;
     cursor: grab;
+
+    box-shadow: 4px 4px rgba(0,0,0, 0.2); 
+  }
+
+  .groups-container .person .delete,
+  .groups-container .role .delete{
+    display: none;
+  }
+
+  .group-sweep-btn{
+    background-color: orange;
+    color: black;
+    padding: 3px 5px;
+    line-height: 1;
+    font-size: 20px;
+  }
+  .group-lock-btn{
+    padding: 5px 9px;
   }
 
 javascript:

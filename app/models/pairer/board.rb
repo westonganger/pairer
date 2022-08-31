@@ -67,9 +67,16 @@ module Pairer
         new_groups.each{|x| x.save! }
       end
 
-      groups.where(person_ids: [nil, ""]).delete_all
+      ### Delete empty groups
+      groups.where(person_ids: [nil, ""]).each{|x| x.destroy! }
 
-      groups.where.not(id: tracked_groups.collect(&:id)).delete_all
+      ### Delete outdated groups
+      groups.where.not(id: tracked_groups.collect(&:id)).each{|x| x.destroy! }
+
+      ### Ensure stats do not contain bogus entries caused by re-shuffling, groups created less than x time ago are deleted upon shuffle
+      groups
+        .where.not(id: new_groups.collect(&:id))
+        .where("#{Pairer::Group.table_name}.created_at <= ?", 1.minutes.ago).each{|x| x.destroy! }
         
       return true
     end
@@ -77,7 +84,7 @@ module Pairer
     def tracked_groups
       groups
         .order(board_iteration_number: :desc)
-        .where("#{Pairer::Group.table_name}.board_iteration_number >= #{current_iteration_number - num_iterations_to_track}")
+        .where("board_iteration_number >= #{current_iteration_number - num_iterations_to_track}")
     end
 
     def stats
@@ -118,7 +125,7 @@ module Pairer
       arr = []
 
       stats.sort_by{|k,count| [-count, k] }.each do |person_names, count|
-        arr << "#{person_names.join(" and ")} have recently paired #{count} times"
+        arr << [person_names, count]
       end
 
       return arr

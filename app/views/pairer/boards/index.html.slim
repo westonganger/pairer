@@ -1,0 +1,23 @@
+.text-center style="max-width: 600px; margin: 0 auto;"
+  .well.well-sm
+    h1.space-above Find Existing Board
+
+    = form_tag nil, method: :get, class: 'form-inline' do
+      label Board Password
+      input.form-control name="password" type="password" autofocus=true
+      
+      button.btn.btn-sm.btn-success.space-left3 type="submit" Find Board
+
+  .well.well-sm.space-above5
+    h1.space-above Create New Board
+
+    = form_tag boards_path, method: :post, class: 'form-inline' do
+      label Board Password
+      input.form-control.password name="password" type="password"
+      i.icon-eye-open.space-left title="Toggle Password Visibility" onclick="$('input.password').attr('type', ($('input.password').attr('type') == 'text' ? 'password' : 'text'))"
+
+      button.btn.btn-sm.btn-default.space-left3 type="submit" 
+        i.icon-plus.space-right
+        span Create Board
+
+      .hint You can give out this password to give others access to your new board

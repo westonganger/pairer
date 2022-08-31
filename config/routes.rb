@@ -1,9 +1,9 @@
 Pairer::Engine.routes.draw do
-  get :sign_in, to: "main#sign_in"
-  post :sign_in, to: "main#sign_in"
-  get :sign_out, to: "main#sign_out"
+  get :sign_in, to: "sessions#sign_in"
+  post :sign_in, to: "sessions#sign_in"
+  get :sign_out, to: "sessions#sign_out"
 
-  resources :boards, controller: :main, except: [:new, :edit] do
+  resources :boards, controller: :boards, except: [:new, :edit] do
     member do
       post :shuffle
       post :create_person
@@ -20,7 +20,7 @@ Pairer::Engine.routes.draw do
 
   match '*a', to: 'application#render_404', via: :get
 
-  get "/", to: "main#index"
+  get "/", to: "boards#index"
 
-  root "main#index"
+  root "boards#index"
 end

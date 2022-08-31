@@ -4,6 +4,6 @@ span.person data-person-id=person.public_id
   = link_to lock_person_board_path(@board, person_id: person), data: {method: :post}, class: 'btn btn-xs btn-default space-left2', title: "Lock Person" do
     i class=(person.locked? ? 'icon-lock' : 'icon-unlock')
 
-  span.space-left
+  span.space-left.delete
     = link_to delete_person_board_path(@board, person_id: person), data: {method: :delete, confirm: "Are you sure you want to delete person '#{person.name}'?"}, title: "Delete Person", class: 'btn btn-xs btn-danger' do
       i.icon-trash
