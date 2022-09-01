@@ -4,8 +4,8 @@ module Pairer
     has_many :groups, class_name: "Pairer::Group", dependent: :destroy
 
     validates :name, presence: true
-    validates :org_name, presence: true, inclusion: {in: ->(x){ Pairer.allowed_org_names }}
-    validates :password, presence: true, uniqueness: {message: "invalid password, please use a different one", scope: :org_name}
+    validates :org_id, presence: true, inclusion: {in: ->(x){ Pairer.allowed_org_ids }}
+    validates :password, presence: true, uniqueness: {message: "invalid password, please use a different one", scope: :org_id}
     validates :current_iteration_number, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
     validates :num_iterations_to_track, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 30 }
     validates :group_size, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }

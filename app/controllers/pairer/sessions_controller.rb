@@ -10,8 +10,8 @@ module Pairer
         end
 
       elsif request.method == "POST"
-        if Pairer.allowed_org_names.include?(params[:org_name]&.downcase)
-          session[:current_org_name] = params[:org_name].downcase
+        if Pairer.allowed_org_ids.include?(params[:org_id]&.downcase)
+          session[:pairer_current_org_id] = params[:org_id].downcase
           redirect_to boards_path
         end
       end
@@ -21,8 +21,8 @@ module Pairer
       if !signed_in?
         redirect_to action: :sign_in
       else
-        session.delete(:current_org_name)
-        session.delete(:current_board_id)
+        session.delete(:pairer_current_org_id)
+        session.delete(:pairer_current_board_id)
         flash.notice = "Signed out"
         redirect_to sign_in_path
       end

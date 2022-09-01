@@ -1,18 +1,18 @@
 require 'spec_helper'
 
 RSpec.describe Pairer::BoardsController, type: :request do
-  def org_name
-    Pairer.allowed_org_names.first
+  def org_id
+    Pairer.allowed_org_ids.first
   end
 
   def org_login
-    post pairer.sign_in_path, params: {org_name: org_name}
+    post pairer.sign_in_path, params: {org_id: org_id}
     assert_equal(response.status, 302)
     assert_redirected_to pairer.boards_path
   end
 
   def board_login
-    @board = Pairer::Board.create!(name: :foobar, password: :foo_password, org_name: org_name)
+    @board = Pairer::Board.create!(name: :foobar, password: :foo_password, org_id: org_id)
 
     get pairer.boards_path, params: {password: @board.password}
     assert_equal(response.status, 302)
@@ -53,15 +53,15 @@ RSpec.describe Pairer::BoardsController, type: :request do
     assert_redirected_to pairer.sign_in_path
   end
 
-  it "index with invalid org name" do
-    bad_org_name = "invalid-org-name"
+  it "index with invalid org_id" do
+    bad_org_id = "something-invalid"
 
-    allow(Pairer).to receive(:allowed_org_names).and_return([bad_org_name])
-    post pairer.sign_in_path, params: {org_name: org_name}
+    allow(Pairer).to receive(:allowed_org_ids).and_return([bad_org_id])
+    post pairer.sign_in_path, params: {org_id: org_id}
     assert_equal(response.status, 302)
     assert_redirected_to pairer.boards_path
 
-    allow(Pairer).to receive(:allowed_org_names).and_call_original
+    allow(Pairer).to receive(:allowed_org_ids).and_call_original
     get pairer.boards_path
     assert_equal(response.status, 302)
     assert_redirected_to pairer.sign_in_path

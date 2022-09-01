@@ -1,1 +1,1 @@
-Pairer.allowed_org_names = ["example-org"]
+Pairer.allowed_org_ids = ["example-org"]

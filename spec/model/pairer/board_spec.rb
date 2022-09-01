@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Pairer::Board, type: :model do
 
-  let(:board) { Pairer::Board.create!(org_name: Pairer.allowed_org_names.first, password: :foobar) }
+  let(:board) { Pairer::Board.create!(org_id: Pairer.allowed_org_ids.first, password: :foobar) }
 
   context "shuffle" do
     it "assigns the correct iteration number" do

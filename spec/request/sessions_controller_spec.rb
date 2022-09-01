@@ -1,12 +1,12 @@
 require 'spec_helper'
 
 RSpec.describe Pairer::SessionsController, type: :request do
-  def org_name
-    Pairer.allowed_org_names.first
+  def org_id
+    Pairer.allowed_org_ids.first
   end
 
   def org_login
-    post pairer.sign_in_path, params: {org_name: org_name}
+    post pairer.sign_in_path, params: {org_id: org_id}
     assert_equal(response.status, 302)
     assert_redirected_to pairer.boards_path
   end
@@ -43,7 +43,7 @@ RSpec.describe Pairer::SessionsController, type: :request do
     assert(response.body.include?("Sign In"))
 
     ### Signed out, passing org name
-    post pairer.sign_in_path, params: {org_name: Pairer.allowed_org_names.first}
+    post pairer.sign_in_path, params: {org_id: Pairer.allowed_org_ids.first}
     assert_equal(response.status, 302)
     assert_redirected_to pairer.boards_path
   end

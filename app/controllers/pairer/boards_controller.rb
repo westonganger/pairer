@@ -12,10 +12,10 @@ module Pairer
 
     def index
       if params[:password].present?
-        @board = Pairer::Board.find_by(org_name: session[:current_org_name], password: params[:password])
+        @board = Pairer::Board.find_by(org_id: session[:pairer_current_org_id], password: params[:password])
         if @board
-          session[:current_board_id] = @board.to_param
-          redirect_to action: :show, id: session[:current_board_id]
+          session[:pairer_current_board_id] = @board.to_param
+          redirect_to action: :show, id: session[:pairer_current_board_id]
         else
           flash.now.alert = "Board not found."
           render
@@ -24,17 +24,17 @@ module Pairer
     end
 
     def create
-      @board = Pairer::Board.new(password: params[:password], org_name: session[:current_org_name])
+      @board = Pairer::Board.new(password: params[:password], org_id: session[:pairer_current_org_id])
 
       if @board.save
-        session[:current_board_id] = @board.to_param
+        session[:pairer_current_board_id] = @board.to_param
         flash.notice = "Board created."
         redirect_to(action: :show, id: @board.to_param)
       else
-        other_board = Pairer::Board.find_by(org_name: session[:current_org_name], password: params[:password])
+        other_board = Pairer::Board.find_by(org_id: session[:pairer_current_org_id], password: params[:password])
 
         if other_board
-          session[:current_board_id] = other_board.to_param
+          session[:pairer_current_board_id] = other_board.to_param
           flash.notice = "Existing board found."
           redirect_to(action: :show, id: other_board.to_param)
         else
@@ -140,11 +140,11 @@ module Pairer
     private
 
     def get_board
-      if session[:current_board_id].blank?
+      if session[:pairer_current_board_id].blank?
         redirect_to(action: :index)
       end
 
-      @board = Pairer::Board.find_by!(org_name: session[:current_org_name], public_id: params[:id])
+      @board = Pairer::Board.find_by!(org_id: session[:pairer_current_org_id], public_id: params[:id])
     end
 
   end

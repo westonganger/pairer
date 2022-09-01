@@ -42,7 +42,7 @@ RSpec.configure do |config|
 
 
   config.before(:all) do
-    Pairer.allowed_org_names = ["example"]
+    Pairer.allowed_org_ids = ["example"]
   end
 
   require 'rails-controller-testing'

@@ -9,7 +9,7 @@ class AddPairerTables < ActiveRecord::Migration[6.0]
       t.integer :num_iterations_to_track, null: false
       t.timestamps
       t.string :public_id, index: true
-      t.string :org_name
+      t.string :org_id
     end
 
     create_table :pairer_people do |t|
