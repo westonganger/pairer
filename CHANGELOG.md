@@ -1,11 +1,20 @@
 # CHANGELOG
 
+
+### September 4, 2022
+- Write unit tests for Pairer::Board#shuffle and #stats
+- Fix bug where recently re-shuffled groups were being included in the stats
+- Ensure the position of locked people in existing groups are preserved across shuffle
+- Improve shuffling algorithm by shuffling 3 times, like a card dealer we shuffle a few times to improve the shuffle
+
 ### Aug 31, 2022
 - Add namespace/prefix for session variables to avoid conflicts
 - Rename org_name --> org_id
   * Organization Name --> Organization ID
   * Pairer.allowed_org_names --> Pairer.allowed_org_ids
   * pairer_boards.org_name --> pairer_boards.org_id
+  * To upgrade from a previous version, add the following to your `config/initializers/pairer.rb`
+    * `require Pairer.root.join("app/models/pairer/board"); ActiveRecord::Migration.new.rename_column(:pairer_boards, :org_name, :org_id) if Pairer::Board.column_names.include?("org_name")`
 - Style improvements
 - Add another button for "Add Group" below group list for more intuitive feel
 

@@ -69,7 +69,7 @@ module Pairer
       if saved
         if params.dig(:board, :password)
           flash.notice = "Password updated."
-        elsif
+        else
           flash.notice = "Board updated."
         end
       else
@@ -91,33 +91,67 @@ module Pairer
     end
 
     def create_person
-      @board.people.create(name: params[:name])
-      redirect_to(action: :show)
+      @person = @board.people.create(name: params[:name])
+
+      if request.format.js?
+        render
+      else
+        redirect_to(action: :show)
+      end
     end
 
     def lock_person
-      @board.people.find_by!(public_id: params.require(:person_id)).toggle!(:locked)
-      redirect_to(action: :show)
+      @person = @board.people.find_by!(public_id: params.require(:person_id))
+
+      @person.toggle!(:locked)
+
+      if request.format.js?
+        render
+      else
+        redirect_to(action: :show)
+      end
     end
 
     def delete_person
-      @board.people.find_by!(public_id: params.require(:person_id)).destroy!
+      @person = @board.people.find_by!(public_id: params.require(:person_id))
+
+      @person.destroy!
+
       redirect_to(action: :show)
     end
 
     def create_group
-      @board.groups.create!(board_iteration_number: @board.current_iteration_number)
-      redirect_to(action: :show)
+      @group = @board.groups.create!(board_iteration_number: @board.current_iteration_number)
+
+      if request.format.js?
+        render
+      else
+        redirect_to(action: :show)
+      end
     end
 
     def lock_group
-      @board.groups.find_by!(public_id: params.require(:group_id)).toggle!(:locked)
-      redirect_to(action: :show)
+      @group = @board.groups.find_by!(public_id: params.require(:group_id))
+
+      @group.toggle!(:locked)
+
+      if request.format.js?
+        render
+      else
+        redirect_to(action: :show)
+      end
     end
 
     def delete_group
-      @board.groups.find_by!(public_id: params.require(:group_id)).destroy!
-      redirect_to(action: :show)
+      @group = @board.groups.find_by!(public_id: params.require(:group_id))
+
+      @group.destroy!
+
+      if request.format.js?
+        render
+      else
+        redirect_to(action: :show)
+      end
     end
 
     def update_group

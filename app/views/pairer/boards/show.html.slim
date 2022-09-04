@@ -35,7 +35,7 @@
   .col-sm-9.groups-container
     h3 
       .pull-left.space-right2 Groups
-      = link_to create_group_board_path(@board), data: {method: :post}, class: 'btn btn-sm btn-default' do
+      = link_to create_group_board_path(@board), data: {method: :post}, remote: true, class: 'btn btn-sm btn-default' do
         i.icon-plus.space-right
         span Add Group
 
@@ -53,34 +53,11 @@
         th style="width: 50%; padding-left: 25px;" People
         th style="padding-left: 25px;" Roles
       tbody
-        - people_by_id = @board.people.map{|x| [x.to_param, x] }.to_h
-
-        - used_person_ids = @board.current_groups.flat_map{|x| x.person_ids_array }
-
-        - used_roles = @board.current_groups.flat_map{|x| x.roles_array }
-
         - @board.current_groups.each do |group|
-          tr
-            td.text-center
-              .space-above2
-                = link_to lock_group_board_path(@board, group_id: group), data: {method: :post}, class: 'btn btn-xs btn-default group-lock-btn', title: "Group #{group.locked? ? "Locked" : "Unlocked"}" do
-                  i class=(group.locked? ? 'icon-lock' : 'icon-unlock')
-
-                = link_to delete_group_board_path(@board, group_id: group), data: {method: :delete}, class: 'btn btn-xs space-left2 group-sweep-btn', title: "Sweep" do
-                  = render "pairer/shared/svg/broom"
-
-            td.person-list data-group-id=group.public_id style="padding-left: 20px;"
-              - group.person_ids_array.each do |person_public_id|
-                - person = people_by_id[person_public_id]
-                - if person
-                  = render 'person', person: person
-
-            td.roles-list data-group-id=group.public_id style="padding-left: 20px;"
-              - group.roles_array.each do |role|
-                = render 'role', role: role
+          = render "group", group: group
 
     div
-      = link_to create_group_board_path(@board), data: {method: :post}, class: 'btn btn-sm btn-default' do
+      = link_to create_group_board_path(@board), data: {method: :post}, remote: true, class: 'btn btn-sm btn-default' do
         i.icon-plus.space-right
         span Add Group
 
@@ -112,7 +89,7 @@
         = "Tracked Groups Iteration Numbers: #{@board.tracked_groups.collect(&:board_iteration_number).uniq.join(", ")}"
 
   .col-sm-3
-    .well.space-above3
+    .well.space-above3.board-roles-container
       h3.space-above
         .pull-left.space-right2 Roles
 
@@ -127,20 +104,21 @@
         - @board.roles_array.select{|x| group_roles.exclude?(x) }.each do |role|
           = render 'role', role: role
 
-      h3.space-above5
-        .pull-left.space-right4 People
+      .board-people-container
+        h3.space-above5
+          .pull-left.space-right4 People
 
-        = form_tag create_person_board_path(@board), class: 'form-inline space-below space-left3' do
-          = text_field_tag :name, nil, placeholder: "Name", style: "width: 150px;", class: 'form-control'
+          = form_tag create_person_board_path(@board), remote: true, class: 'form-inline new-person-form space-below space-left3' do
+            = text_field_tag :name, nil, placeholder: "Name", style: "width: 150px;", class: 'form-control'
 
-          span.space-left
-            button.btn.btn-sm.btn-default type="submit" Add
+            span.space-left
+              button.btn.btn-sm.btn-default type="submit" Add
 
-      .person-list style="min-height: 40px;"
-        - group_person_ids = @board.current_groups.flat_map(&:person_ids_array)
+        .person-list style="min-height: 40px;"
+          - group_person_ids = @board.current_groups.flat_map(&:person_ids_array)
 
-        - @board.people.select{|x| group_person_ids.exclude?(x.public_id) }.sort_by{|x| x.name }.each do |person|
-          = render 'person', person: person
+          - @board.people.select{|x| group_person_ids.exclude?(x.public_id) }.sort_by{|x| x.name }.each do |person|
+            = render 'person', person: person
 
 css:
   .role, 
@@ -188,7 +166,7 @@ javascript:
         item.closest("form").submit();
       }, 1);
     });
-
+  
     $(".person-list").sortable({
       connectWith: ".person-list",
       items: "> .person",

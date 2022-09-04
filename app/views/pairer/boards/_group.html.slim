@@ -1,0 +1,20 @@
+- @people_by_id = @board.people.map{|x| [x.to_param, x] }.to_h
+
+tr.group-row data-group-id=group.public_id
+  td.text-center
+    .space-above2
+      = link_to lock_group_board_path(@board, group_id: group), data: {method: :post}, remote: true, class: 'btn btn-xs btn-default group-lock-btn', title: "Group #{group.locked? ? "Locked" : "Unlocked"}" do
+        i class=(group.locked? ? 'icon-lock' : 'icon-unlock')
+
+      = link_to delete_group_board_path(@board, group_id: group), data: {method: :delete}, remote: true, class: 'btn btn-xs space-left2 group-sweep-btn', title: "Sweep" do
+        = render "pairer/shared/svg/broom"
+
+  td.person-list data-group-id=group.public_id style="padding-left: 20px;"
+    - group.person_ids_array.each do |person_public_id|
+      - person = @people_by_id[person_public_id]
+      - if person
+        = render 'person', person: person
+
+  td.roles-list data-group-id=group.public_id style="padding-left: 20px;"
+    - group.roles_array.each do |role|
+      = render 'role', role: role
