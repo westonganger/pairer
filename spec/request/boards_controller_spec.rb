@@ -67,10 +67,66 @@ RSpec.describe Pairer::BoardsController, type: :request do
     assert_redirected_to pairer.sign_in_path
   end
 
-  it "show" do
-    get pairer.board_path(@board)
-    assert_equal(response.status, 200)
-    assert(response.body.include?("Shuffle"))
+  context "show" do
+    it "displays page with no people or roles" do
+      get pairer.board_path(@board)
+      assert_equal(response.status, 200)
+
+      expect(Nokogiri::XML(response.body).css(".person").size).to eq(0)
+      expect(Nokogiri::XML(response.body).css(".roles").size).to eq(0)
+    end
+
+    it "displays page with people and roles" do
+      @board.update!(roles: ["foo", "bar"])
+
+      3.times.each do |i|
+        @board.people.create!(name: i)
+      end
+
+      get pairer.board_path(@board)
+      assert_equal(response.status, 200)
+
+      expect(Nokogiri::XML(response.body).css(".person").size).to eq(3)
+      expect(Nokogiri::XML(response.body).css(".role").size).to eq(2)
+    end
+
+    it "displays page when groups are populated" do
+      @board.update!(roles: ["foo", "bar"])
+
+      3.times.each do |i|
+        @board.people.create!(name: i)
+      end
+
+      @board.shuffle!
+
+      get pairer.board_path(@board)
+      assert_equal(response.status, 200)
+
+      expect(Nokogiri::XML(response.body).css("tr.group-row").size).to eq(2)
+      expect(Nokogiri::XML(response.body).css("tr.group-row .person").size).to eq(3)
+      expect(Nokogiri::XML(response.body).css("tr.group-row .role").size).to eq(2)
+    end
+
+    it "displays stats" do
+      3.times.each do |i|
+        @board.people.create!(name: i)
+      end
+
+      @board.shuffle!
+
+      expect(@board.stats).not_to be_empty
+
+      get pairer.board_path(@board)
+      assert_equal(response.status, 200)
+
+      expect(Nokogiri::XML(response.body).css("table#stats tbody tr").size).to eq(4)
+    end
+
+    it "displays a shuffle button" do
+      get pairer.board_path(@board)
+      assert_equal(response.status, 200)
+      assert(response.body.include?("Shuffle"))
+    end
   end
 
   it "update" do

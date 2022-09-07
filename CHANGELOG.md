@@ -1,5 +1,8 @@
 # CHANGELOG
 
+### September 7, 2022
+- Attempt to make shuffle algorithm stronger by generating 5 candidate groupings and then choosing the least-common of these groupings based on the stats
+- Show solo groupings in the stats
 
 ### September 4, 2022
 - Write unit tests for Pairer::Board#shuffle and #stats

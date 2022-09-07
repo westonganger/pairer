@@ -70,14 +70,16 @@
     - if stats.empty?
       p Cannot show stats with only 1 person on the board
     - else
-      table.table.table-condensed.table-bordered style="max-width: 400px;"
+      table.table.table-condensed.table-bordered#stats style="max-width: 400px;"
         thead
           th Pair
-          th style="width: 90px;" Pair Count
+          th style="width: 90px;" Count
         tbody
-          - @board.stats.each do |person_names, count|
+          - people_by_id = @board.people.map{|x| [x.to_param, x] }.to_h
+
+          - stats.each do |person_ids, count|
             tr
-              td = person_names.join(", ")
+              td = person_ids.map{|person_id| people_by_id[person_id]&.name }.sort.join(", ")
               td.text-center = count
 
     - if Rails.env.development?

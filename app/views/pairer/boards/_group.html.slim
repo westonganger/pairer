@@ -1,5 +1,3 @@
-- @people_by_id = @board.people.map{|x| [x.to_param, x] }.to_h
-
 tr.group-row data-group-id=group.public_id
   td.text-center
     .space-above2
@@ -11,7 +9,7 @@ tr.group-row data-group-id=group.public_id
 
   td.person-list data-group-id=group.public_id style="padding-left: 20px;"
     - group.person_ids_array.each do |person_public_id|
-      - person = @people_by_id[person_public_id]
+      - person = people_by_id[person_public_id]
       - if person
         = render 'person', person: person
 

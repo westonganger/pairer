@@ -10,6 +10,8 @@ module Pairer
 
     before_action :get_board, except: [:index, :new, :create]
 
+    helper_method :people_by_id
+
     def index
       if params[:password].present?
         @board = Pairer::Board.find_by(org_id: session[:pairer_current_org_id], password: params[:password])
@@ -179,6 +181,10 @@ module Pairer
       end
 
       @board = Pairer::Board.find_by!(org_id: session[:pairer_current_org_id], public_id: params[:id])
+    end
+
+    def people_by_id
+      @people_by_id ||= @board.people.map{|x| [x.to_param, x] }.to_h
     end
 
   end

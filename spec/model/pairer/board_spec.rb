@@ -194,6 +194,36 @@ RSpec.describe Pairer::Board, type: :model do
       expect(board.current_groups.first.person_ids_array.size).to eq(3)
       expect(board.current_groups.first.person_ids_array.intersection(locked_person_ids).size).to eq(2)
     end
+
+    it "reliably produces unique groups of people" do
+      board.update_columns(group_size: 2)
+
+      4.times.each do |i|
+        board.people.create!(name: i)
+      end
+
+      unique_count = 0
+      total_count = 100
+
+      total_count.times.each do |i|
+        board.groups.delete_all
+
+        board.shuffle!
+
+        first_groupings = board.current_groups.map{|x| x.person_ids_array }
+
+        board.shuffle!
+
+        second_groupings = board.current_groups.map{|x| x.person_ids_array }
+
+        if first_groupings.map(&:sort) != second_groupings.map(&:sort)
+          unique_count += 1
+        end
+      end
+
+      ### Can be flaky but should consistently this test, if failing re-run and see if it passes
+      expect((unique_count.to_f/total_count).round(2)).to be >= 0.80
+    end
   end
 
   context "stats" do
@@ -213,18 +243,38 @@ RSpec.describe Pairer::Board, type: :model do
       board.shuffle!
 
       stats = board.stats
-      expect(stats.size).to eq(21)
+      expect(stats.size).to eq(22) ### 1 increase is for solo groups
       expect(stats.map(&:last).uniq.sort).to eq([0,1])
     end
 
     it "shows 0 in stats for pairs that have not yet paired" do
       3.times.each do |i|
-        board.people.create!(name: "#{i}-#{i}", locked: true)
+        board.people.create!(name: i)
       end
 
       stats = board.stats
       expect(stats.size).to eq(3)
       expect(stats.map(&:last)).to eq([0, 0, 0])
+    end
+
+    it "shows number in stats for solos" do
+      3.times.each do |i|
+        board.people.create!(name: i)
+      end
+
+      board.shuffle!
+
+      stats = board.stats
+      expect(stats.detect{|person_ids, _count| person_ids.size == 1 }.last).to eq(1)
+    end
+
+    it "doesnt show zero for solos" do
+      3.times.each do |i|
+        board.people.create!(name: "#{i}-#{i}", locked: true)
+      end
+
+      stats = board.stats
+      expect(stats.detect{|person_ids, _count| person_ids.size == 1 && count == 0 }).to eq(nil)
     end
   end
 

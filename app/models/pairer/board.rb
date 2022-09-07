@@ -1,7 +1,7 @@
 module Pairer
   class Board < ApplicationRecord
     RECENT_RESHUFFLE_DURATION = 1.minute.freeze
-    NUM_SHUFFLES = 3
+    NUM_CANDIDATE_GROUPINGS = 5
 
     has_many :people, class_name: "Pairer::Person", dependent: :destroy
     has_many :groups, class_name: "Pairer::Group", dependent: :destroy
@@ -87,46 +87,82 @@ module Pairer
 
         self.increment!(:current_iteration_number)
 
-        ### Shuffle People
-        NUM_SHUFFLES.times.each do ### Like a card dealer, we shuffle a few times to improve shuffle
-          unlocked_person_ids = unlocked_person_ids.shuffle
+        ### Determine X Candidate Groupings
+        candidate_groupings = []
+
+        i = 0
+        while i < NUM_CANDIDATE_GROUPINGS
+          i += 1
+
+          shuffled_person_ids = unlocked_person_ids.shuffle
+
+          inner_groupings = []
+
+          ### Assign People to Non-Full Unlocked Groups
+          new_groups.select{|x| !x.locked? }.each do |g|
+            num_to_add = self.group_size - g.person_ids_array.size
+
+            next if num_to_add <= 0
+
+            new_person_ids = shuffled_person_ids.first(num_to_add)
+
+            inner_groupings << (g.person_ids_array + new_person_ids)
+
+            shuffled_person_ids = shuffled_person_ids - new_person_ids
+          end
+
+          ### Assign Remaining People to New Groups
+          shuffled_person_ids.shuffle.each_slice(self.group_size).each do |group_person_ids|
+            inner_groupings << group_person_ids
+          end
+
+          candidate_groupings << inner_groupings
         end
 
-        ### Assign People to Non-Full Unlocked Groups
-        new_groups.select{|x| !x.locked? }.each do |g|
-          this_group_size = g.person_ids_array.size
-          num_to_add = self.group_size - this_group_size
+        stats_hash = stats.to_h
 
-          next if num_to_add <= 0
+        ### Determine Most Unique of the Candidate Groupings
+        chosen_groupings = candidate_groupings.min do |person_id_groups, counts| 
+          scores = []
 
-          new_person_ids = unlocked_person_ids.first(num_to_add)
+          person_id_groups.each do |person_ids|
+            if person_ids.size == 1
+              scores << (stats_hash[person_ids] || 0)
+            else
+              ### For permutations size, we use 2 instead of self.group_size as we are running stats on pairs, not groups
+              permutations = person_ids.permutation(2)
 
-          unlocked_person_ids = unlocked_person_ids - new_person_ids
+              permutations.map{|x| x.sort }.uniq.each do |sorted_pair_person_ids|
+                scores << stats_hash[sorted_pair_person_ids]
+              end
+            end
+          end
 
-          g.person_ids = g.person_ids_array + new_person_ids
+          (BigDecimal(scores.sum) / scores.size) ### average
         end
 
         ### Assign People to New Groups
-        unlocked_person_ids.shuffle.each_slice(self.group_size).each do |x|
-          new_groups << groups.new(
-            board_iteration_number: next_iteration_number,
-            person_ids: x,
-          )
+        chosen_groupings.each do |new_group_person_ids|
+          new_group_index = new_groups.index{|group| 
+            group.person_ids_array.any?{|person_id| new_group_person_ids.include?(person_id) } 
+          }
+
+          if new_group_index
+            new_groups[new_group_index].person_ids = new_group_person_ids
+          else
+            new_groups << groups.new(board_iteration_number: next_iteration_number, person_ids: new_group_person_ids)
+          end
         end
 
         ### Shuffle Roles
-        NUM_SHUFFLES.times.each do ### Like a card dealer, we shuffle a few times to improve shuffle
-          available_roles = available_roles.shuffle
-        end
+        available_roles = available_roles.shuffle
 
         unlocked_new_groups = new_groups.select{|x| !x.locked? }
 
         ### Assign Roles to Groups
-        until available_roles.empty?
-          available_roles.shuffle.in_groups(unlocked_new_groups.size, false).each_with_index do |roles, i|
-            unlocked_new_groups[i].roles = roles
-            available_roles = (available_roles - roles)
-          end
+        available_roles.in_groups(unlocked_new_groups.size, false).each_with_index do |roles, i|
+          unlocked_new_groups[i].roles = unlocked_new_groups[i].roles_array + roles
+          available_roles = available_roles - roles
         end
 
         ### Save New Groups
@@ -168,43 +204,33 @@ module Pairer
           next if i == i2
 
           if p2
-            sorted_pair_names = [p.name, p2.name].sort
+            sorted_person_ids = [p.public_id, p2.public_id].sort
 
-            stats[sorted_pair_names] ||= 0
+            stats[sorted_person_ids] ||= 0
           end
         end
       end
 
-      person_names_by_public_id = people.pluck(:public_id, :name).to_h
-
       tracked_groups.each do |group|
         group_person_ids = group.person_ids_array
 
-        group_person_ids.each_with_index do |person_id, i|
-          next if i+1 == group_person_ids.size
+        ### For permutations size, we use 2 instead of self.group_size as we are running stats on pairs, not groups
+        if group_person_ids.size == 1
+          stats[group_person_ids] ||= 0
+          stats[group_person_ids] += 1
+        else
+          permutations = group_person_ids.permutation(2)
 
-          person_name = person_names_by_public_id[person_id]
-
-          next if person_name.nil?
-
-          group_person_ids.each_with_index do |other_person_id, i2|
-            next if i == i2
-
-            other_person_name = person_names_by_public_id[other_person_id]
-
-            next if other_person_name.nil?
-
-            sorted_pair_names = [person_name, other_person_name].sort
-
-            stats[sorted_pair_names] += 1
+          permutations.map{|x| x.sort }.uniq.each do |sorted_pair_person_ids|
+            stats[sorted_pair_person_ids] += 1
           end
         end
       end
 
       arr = []
 
-      stats.sort_by{|k,count| [-count, k] }.each do |person_names, count|
-        arr << [person_names, count]
+      stats.sort_by{|k,count| -count }.each do |person_ids, count|
+        arr << [person_ids, count]
       end
 
       return arr
