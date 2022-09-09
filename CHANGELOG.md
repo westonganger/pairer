@@ -1,5 +1,8 @@
 # CHANGELOG
 
+### September 8, 2022
+- Remove zeros from stats, having zeros is not sustainable because it will make the list massive for larger team sizes
+
 ### September 7, 2022
 - Attempt to make shuffle algorithm stronger by generating 5 candidate groupings and then choosing the least-common of these groupings based on the stats
 - Show solo groupings in the stats

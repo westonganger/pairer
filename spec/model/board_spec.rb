@@ -237,24 +237,23 @@ RSpec.describe Pairer::Board, type: :model do
       end
 
       stats = board.stats
-      expect(stats.size).to eq(21)
-      expect(stats.map(&:last).uniq.sort).to eq([0])
+      expect(stats.size).to eq(0)
 
       board.shuffle!
 
       stats = board.stats
-      expect(stats.size).to eq(22) ### 1 increase is for solo groups
-      expect(stats.map(&:last).uniq.sort).to eq([0,1])
+
+      expect(stats.size).to eq(3)
+      expect(stats.map(&:last)).to eq([1,1,1])
     end
 
-    it "shows 0 in stats for pairs that have not yet paired" do
+    it "doesnt include zeros" do
       3.times.each do |i|
         board.people.create!(name: i)
       end
 
       stats = board.stats
-      expect(stats.size).to eq(3)
-      expect(stats.map(&:last)).to eq([0, 0, 0])
+      expect(stats.detect{|person_ids, _count| person_ids.size == 1 && count == 0 }).to eq(nil)
     end
 
     it "shows number in stats for solos" do
@@ -266,15 +265,6 @@ RSpec.describe Pairer::Board, type: :model do
 
       stats = board.stats
       expect(stats.detect{|person_ids, _count| person_ids.size == 1 }.last).to eq(1)
-    end
-
-    it "doesnt show zero for solos" do
-      3.times.each do |i|
-        board.people.create!(name: "#{i}-#{i}", locked: true)
-      end
-
-      stats = board.stats
-      expect(stats.detect{|person_ids, _count| person_ids.size == 1 && count == 0 }).to eq(nil)
     end
   end
 

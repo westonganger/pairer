@@ -133,7 +133,7 @@ module Pairer
               permutations = person_ids.permutation(2)
 
               permutations.map{|x| x.sort }.uniq.each do |sorted_pair_person_ids|
-                scores << stats_hash[sorted_pair_person_ids]
+                scores << (stats_hash[sorted_pair_person_ids] || 0)
               end
             end
           end
@@ -196,21 +196,6 @@ module Pairer
     def stats
       stats = {}
 
-      ### Initialize all possible permutations with 0
-      people.each_with_index do |p, i|
-        next if i+1 == people.size
-
-        people.each_with_index do |p2, i2|
-          next if i == i2
-
-          if p2
-            sorted_person_ids = [p.public_id, p2.public_id].sort
-
-            stats[sorted_person_ids] ||= 0
-          end
-        end
-      end
-
       tracked_groups.each do |group|
         group_person_ids = group.person_ids_array
 
@@ -222,6 +207,7 @@ module Pairer
           permutations = group_person_ids.permutation(2)
 
           permutations.map{|x| x.sort }.uniq.each do |sorted_pair_person_ids|
+            stats[sorted_pair_person_ids] ||= 0
             stats[sorted_pair_person_ids] += 1
           end
         end

@@ -119,7 +119,7 @@ RSpec.describe Pairer::BoardsController, type: :request do
       get pairer.board_path(@board)
       assert_equal(response.status, 200)
 
-      expect(Nokogiri::XML(response.body).css("table#stats tbody tr").size).to eq(4)
+      expect(Nokogiri::XML(response.body).css("table#stats tbody tr").size).to eq(2)
     end
 
     it "displays a shuffle button" do

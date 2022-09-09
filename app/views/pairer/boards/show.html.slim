@@ -93,7 +93,7 @@
   .col-sm-3
     .well.space-above3.board-roles-container
       h3.space-above
-        .pull-left.space-right2 Roles
+        .pull-left.space-right3 Roles
 
         = form_tag board_path(@board), method: :patch, class: 'form-inline space-below space-left3' do
           = text_field_tag :add_role_name, nil, placeholder: "Role Name", style: "width: 150px;", class: 'form-control'
@@ -108,7 +108,7 @@
 
       .board-people-container
         h3.space-above5
-          .pull-left.space-right4 People
+          .pull-left.space-right3 People
 
           = form_tag create_person_board_path(@board), remote: true, class: 'form-inline new-person-form space-below space-left3' do
             = text_field_tag :name, nil, placeholder: "Name", style: "width: 150px;", class: 'form-control'
