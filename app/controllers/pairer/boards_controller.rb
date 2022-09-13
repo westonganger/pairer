@@ -75,7 +75,11 @@ module Pairer
           flash.notice = "Board updated."
         end
       else
-        flash.alert = "Board not saved."
+        if @board.errors[:num_iterations_to_track].present?
+          flash.alert = "Number of Iterations to Track #{@board.errors[:num_iterations_to_track].first}"
+        else
+          flash.alert = "Board not saved."
+        end
       end
 
       redirect_to(action: :show)

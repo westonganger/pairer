@@ -1,5 +1,16 @@
 # CHANGELOG
 
+### September 12, 2022
+- Ensure roles dont allow duplicates with uppercase/lowercase
+- Ensure persons name uniqueness validation is case-insensitive
+- Add configuration value `Pairer.max_number_of_iterations = 100`
+- Add better validation error for number of iterations to track
+- Increase alert/error message hide timeout for better UX
+- Add Test Suite with Github Actions for all Ruby, Rails and DB versions
+- Change Shuffle Algorithm to more deterministicly choose the most unique groups
+  * Score of each set of people is from the following formula. We generate all possible group combinations of people, given what we have left/available. We choose the group combination by selecting the minimum sum of the number of occurences of all 2-person combinations within te group combination.
+  * The algorithm is naive in that it does not attempt to enumerate the very best combinations based on all possible outcomes. It just selects the best combinations for whatever groups are created first, so future iterations of the combinations may not be fully optimal. Non-full unlocked groups with locked-people are assigned people first, then secondly the completely new groups.
+
 ### September 8, 2022
 - Remove zeros from stats, having zeros is not sustainable because it will make the list massive for larger team sizes
 

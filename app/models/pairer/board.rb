@@ -10,7 +10,7 @@ module Pairer
     validates :org_id, presence: true, inclusion: {in: ->(x){ Pairer.allowed_org_ids }}
     validates :password, presence: true, uniqueness: {message: "invalid password, please use a different one", scope: :org_id}
     validates :current_iteration_number, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-    validates :num_iterations_to_track, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 30 }
+    validates :num_iterations_to_track, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: ->(x){ Pairer.max_iterations_to_track } }
     validates :group_size, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
     before_validation on: :create do
@@ -32,7 +32,7 @@ module Pairer
 
     def roles=(val)
       if val.is_a?(Array)
-        self[:roles] = val.map{|x| x.presence&.strip }.uniq.compact.sort.join(";;")
+        self[:roles] = val.map{|x| x.presence&.strip }.uniq(&:downcase).compact.sort.join(";;")
       else
         raise "invalid behaviour"
       end
@@ -43,114 +43,108 @@ module Pairer
     end
 
     def shuffle!
-      unlocked_person_ids = people.select{|x| !x.locked? }.collect(&:public_id)
-
       new_groups = []
 
       prev_iteration_number = current_iteration_number
       next_iteration_number = current_iteration_number + 1
 
-      if unlocked_person_ids.any?
-        available_roles = roles_array
+      available_person_ids = people.select{|x| !x.locked? }.collect(&:public_id)
+      available_roles = roles_array
 
-        ### Build New Groups
-        groups.where(board_iteration_number: prev_iteration_number).each do |g|
-          if g.locked?
-            ### Clone Locked Groups
-            
-            new_group = g.dup
+      ### Build New Groups
+      groups.where(board_iteration_number: prev_iteration_number).each do |g|
+        if g.locked?
+          ### Clone Locked Groups
+          
+          new_group = g.dup
 
-            new_group.assign_attributes(
-              public_id: nil,
+          new_group.assign_attributes(
+            public_id: nil,
+            board_iteration_number: next_iteration_number,
+          )
+
+          new_groups << new_group
+
+          available_person_ids = (available_person_ids - g.person_ids_array)
+
+          available_roles = (available_roles - new_group.roles_array)
+        else
+          ### Retain Position of Locked People within Existing Groups
+          
+          group_locked_person_ids = (g.person_ids_array - available_person_ids)
+
+          if group_locked_person_ids.any?
+            new_group = groups.new(
               board_iteration_number: next_iteration_number,
+              roles: [],
+              person_ids: group_locked_person_ids,
             )
 
             new_groups << new_group
 
-            available_roles = (available_roles - new_group.roles_array)
-          else
-            ### Retain Position of Locked People within Existing Groups
+            available_person_ids = (available_person_ids - g.person_ids_array)
+          end
+        end
+      end
+
+      self.increment!(:current_iteration_number)
+
+      if available_person_ids.any?
+        pair_stats_hash = stats_hash_for_two_pairs
+
+        ### Assign People to Non-Full Unlocked Groups
+        new_groups.select{|x| !x.locked? }.each do |g|
+          break if available_person_ids.empty?
+
+          num_to_add = self.group_size - g.person_ids_array.size
+
+          next if num_to_add <= 0
+
+          if available_person_ids.size < num_to_add
+            ### Add to group whatever is left
             
-            group_locked_person_ids = (g.person_ids_array - unlocked_person_ids)
+            g.person_ids = g.person_ids_array + available_person_ids
 
-            if group_locked_person_ids.any?
-              new_group = groups.new(
-                board_iteration_number: next_iteration_number,
-                roles: [],
-                person_ids: group_locked_person_ids,
-              )
+            available_person_ids = []
 
-              new_groups << new_group
-            end
-          end
-        end
-
-        self.increment!(:current_iteration_number)
-
-        ### Determine X Candidate Groupings
-        candidate_groupings = []
-
-        i = 0
-        while i < NUM_CANDIDATE_GROUPINGS
-          i += 1
-
-          shuffled_person_ids = unlocked_person_ids.shuffle
-
-          inner_groupings = []
-
-          ### Assign People to Non-Full Unlocked Groups
-          new_groups.select{|x| !x.locked? }.each do |g|
-            num_to_add = self.group_size - g.person_ids_array.size
-
-            next if num_to_add <= 0
-
-            new_person_ids = shuffled_person_ids.first(num_to_add)
-
-            inner_groupings << (g.person_ids_array + new_person_ids)
-
-            shuffled_person_ids = shuffled_person_ids - new_person_ids
+            break
           end
 
-          ### Assign Remaining People to New Groups
-          shuffled_person_ids.shuffle.each_slice(self.group_size).each do |group_person_ids|
-            inner_groupings << group_person_ids
+          group_size_combinations = available_person_ids.combination(num_to_add).map{|x| x + g.person_ids_array }.shuffle
+
+          ### Choose group using minimum score
+          chosen_person_ids = group_size_combinations.min_by do |person_ids|
+            person_ids.combination(2).map(&:sort).sum{|k| pair_stats_hash[k] || 0 }
           end
 
-          candidate_groupings << inner_groupings
-        end
-
-        stats_hash = stats.to_h
-
-        ### Determine Most Unique of the Candidate Groupings
-        chosen_groupings = candidate_groupings.min do |person_id_groups, counts| 
-          scores = []
-
-          person_id_groups.each do |person_ids|
-            if person_ids.size == 1
-              scores << (stats_hash[person_ids] || 0)
-            else
-              ### For permutations size, we use 2 instead of self.group_size as we are running stats on pairs, not groups
-              permutations = person_ids.permutation(2)
-
-              permutations.map{|x| x.sort }.uniq.each do |sorted_pair_person_ids|
-                scores << (stats_hash[sorted_pair_person_ids] || 0)
-              end
-            end
-          end
-
-          (BigDecimal(scores.sum) / scores.size) ### average
+          g.person_ids = (g.person_ids_array | chosen_person_ids).sort
         end
 
         ### Assign People to New Groups
-        chosen_groupings.each do |new_group_person_ids|
-          new_group_index = new_groups.index{|group| 
-            group.person_ids_array.any?{|person_id| new_group_person_ids.include?(person_id) } 
-          }
+        while available_person_ids.any? do
+          if available_person_ids.size <= self.group_size
+            ### Create group using whats left
+            
+            new_groups << groups.new(
+              board_iteration_number: next_iteration_number,
+              person_ids: available_person_ids,
+            )
 
-          if new_group_index
-            new_groups[new_group_index].person_ids = new_group_person_ids
+            available_person_ids = []
           else
-            new_groups << groups.new(board_iteration_number: next_iteration_number, person_ids: new_group_person_ids)
+            group_size_combinations = available_person_ids.combination(self.group_size).to_a.shuffle
+
+            ### Choose group using minimum score
+            chosen_person_ids = group_size_combinations.min_by do |person_ids|
+              person_ids.combination(2).map(&:sort).sum{|k| pair_stats_hash[k] || 0 }
+            end
+
+            new_groups << groups.new(
+              board_iteration_number: next_iteration_number,
+              person_ids: chosen_person_ids,
+            )
+
+            available_person_ids = (available_person_ids - chosen_person_ids)
           end
         end
 
@@ -194,32 +188,38 @@ module Pairer
     end
 
     def stats
-      stats = {}
+      array = []
+
+      stats_hash_for_two_pairs.sort_by{|k,count| -count }.each do |person_ids, count|
+        array << [person_ids, count]
+      end
+
+      return array
+    end
+
+    private
+    
+    def stats_hash_for_two_pairs
+      h = {}
 
       tracked_groups.each do |group|
         group_person_ids = group.person_ids_array
 
-        ### For permutations size, we use 2 instead of self.group_size as we are running stats on pairs, not groups
+        ### For combinations size, we use 2 instead of self.group_size as we are running stats on pairs, not groups
         if group_person_ids.size == 1
-          stats[group_person_ids] ||= 0
-          stats[group_person_ids] += 1
+          h[group_person_ids] ||= 0
+          h[group_person_ids] += 1
         else
-          permutations = group_person_ids.permutation(2)
+          combinations = group_person_ids.combination(2)
 
-          permutations.map{|x| x.sort }.uniq.each do |sorted_pair_person_ids|
-            stats[sorted_pair_person_ids] ||= 0
-            stats[sorted_pair_person_ids] += 1
+          combinations.map{|x| x.sort }.each do |sorted_pair_person_ids|
+            h[sorted_pair_person_ids] ||= 0
+            h[sorted_pair_person_ids] += 1
           end
         end
       end
 
-      arr = []
-
-      stats.sort_by{|k,count| -count }.each do |person_ids, count|
-        arr << [person_ids, count]
-      end
-
-      return arr
+      return h
     end
 
   end

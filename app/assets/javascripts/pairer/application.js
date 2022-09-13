@@ -7,7 +7,7 @@ window.init = function(){
   var alerts = $(".alert:not(.permanent)")
   setTimeout(function(){
     alerts.fadeOut();
-  }, 5000);
+  }, 8000);
 
   $('.is-chosen').chosen({
     width: '220px', 

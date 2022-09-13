@@ -7,7 +7,7 @@ module Pairer
 
     def person_ids=(val)
       if val.is_a?(Array)
-        sanitized_array = val.map{|x| x.presence&.strip }.uniq.compact
+        sanitized_array = val.map{|x| x.presence&.strip }.uniq(&:downcase).compact
 
         if !new_record?
           sanitized_array = sanitized_array.intersection(board.people.map(&:public_id)) ### This may slow the query down
@@ -25,7 +25,7 @@ module Pairer
 
     def roles=(val)
       if val.is_a?(Array)
-        sanitized_array = self[:roles] = val.map{|x| x.presence&.strip }.uniq.compact
+        sanitized_array = self[:roles] = val.map{|x| x.presence&.strip }.uniq(&:downcase).compact
 
         if !new_record?
           sanitized_array = sanitized_array.intersection(board.roles_array) ### This may slow the query down

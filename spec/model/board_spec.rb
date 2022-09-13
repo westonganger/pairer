@@ -8,6 +8,14 @@ RSpec.describe Pairer::Board, type: :model do
     ENV.delete('DELETE_RECENT_RESHUFFLED')
   end
 
+  context "roles=" do
+    it "automatically removes duplicates case-insensitive" do
+      board.update!(roles: ["foo", "FOO", "bar", "bar"])
+
+      expect(board.roles_array).to eq(["foo", "bar"].sort)
+    end
+  end
+
   context "shuffle" do
     it "incrementes the iteration number" do
       3.times.each do |i|
@@ -196,33 +204,35 @@ RSpec.describe Pairer::Board, type: :model do
     end
 
     it "reliably produces unique groups of people" do
-      board.update_columns(group_size: 2)
+      board.update_columns(group_size: 2, num_iterations_to_track: 100)
 
-      4.times.each do |i|
+      5.times.each do |i|
         board.people.create!(name: i)
       end
 
-      unique_count = 0
-      total_count = 100
+      stats = {}
 
-      total_count.times.each do |i|
-        board.groups.delete_all
-
+      100.times.each do |i|
         board.shuffle!
 
-        first_groupings = board.current_groups.map{|x| x.person_ids_array }
-
-        board.shuffle!
-
-        second_groupings = board.current_groups.map{|x| x.person_ids_array }
-
-        if first_groupings.map(&:sort) != second_groupings.map(&:sort)
-          unique_count += 1
+        board.current_groups.reload.each do |x| 
+          stats[x.person_ids_array] ||= 0
+          stats[x.person_ids_array] += 1 
         end
       end
 
-      ### Can be flaky but should consistently this test, if failing re-run and see if it passes
-      expect((unique_count.to_f/total_count).round(2)).to be >= 0.80
+      uniq_stat_counts = stats.map(&:last).uniq.sort
+
+      if uniq_stat_counts == [20]
+        # Best case scenario
+      elsif uniq_stat_counts == [19,20,21]
+        # If they are not all equal sized then at least they are very close (~1 off)
+      else
+        fail "Invalid outcome"
+      end
+
+      expect(stats.map{|x| x.first.size }.uniq.sort).to eq([1,2])
+      expect(stats.size).to eq(15)
     end
   end
 
