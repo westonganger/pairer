@@ -8,16 +8,6 @@ window.init = function(){
   setTimeout(function(){
     alerts.fadeOut();
   }, 8000);
-
-  $('.is-chosen').chosen({
-    width: '220px', 
-    search_contains: true,
-  });
-
-  $('.chosen-100').chosen({
-    width: '100%', 
-    search_contains: true,
-  });
 }
 
 $(function(){
