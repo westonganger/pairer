@@ -14,6 +14,11 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
+ENV['DB_GEM'] ||= 'sqlite3'
+
+gem 'rails', ENV["RAILS_VERSION"]
+gem ENV['DB_GEM']
+
 group :development do
   gem "webrick"
   gem "better_errors"

@@ -203,7 +203,7 @@ RSpec.describe Pairer::Board, type: :model do
       expect(board.current_groups.first.person_ids_array.intersection(locked_person_ids).size).to eq(2)
     end
 
-    it "reliably produces unique groups of people" do
+    it "reliably produces unique groups of people at size == 2" do
       board.update_columns(group_size: 2, num_iterations_to_track: 100)
 
       5.times.each do |i|
@@ -233,6 +233,41 @@ RSpec.describe Pairer::Board, type: :model do
 
       expect(stats.map{|x| x.first.size }.uniq.sort).to eq([1,2])
       expect(stats.size).to eq(15)
+    end
+
+    it "reliably produces unique groups of people at size > 2" do
+      board.update_columns(group_size: 3, num_iterations_to_track: 100)
+
+      15.times.each do |i|
+        board.people.create!(name: i)
+      end
+
+      stats = {}
+
+      100.times.each do |i|
+        board.shuffle!
+
+        board.current_groups.reload.each do |x| 
+          stats[x.person_ids_array] ||= 0
+          stats[x.person_ids_array] += 1 
+        end
+      end
+
+      uniq_stat_counts = stats.map(&:last).uniq.sort
+
+      if uniq_stat_counts == [1,2,3,4,5]
+      elsif uniq_stat_counts == [1,2,3,4]
+      elsif uniq_stat_counts == [1,2,3,4,6]
+        # Best case scenario
+      elsif uniq_stat_counts == [19,20,21]
+        # If they are not all equal sized then at least they are very close (~1 off)
+      else
+        expect(uniq_stat_counts).to eq(nil)
+        fail "Invalid outcome"
+      end
+
+      expect(stats.map{|x| x.first.size }.uniq.sort).to eq([3])
+      expect(stats.size).to eq(329)
     end
   end
 
