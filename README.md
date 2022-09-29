@@ -105,7 +105,11 @@ Run server using: `bin/dev` or `cd test/dummy/; rails s`
 bundle exec rspec
 ```
 
-We test multiple versions of `Rails` using the `appraisal` gem. Please use the following steps to test using `appraisal`.
+We can locally test different versions of Rails using `ENV['RAILS_VERSION']` and different database gems using `ENV['DB_GEM']`
 
-1. `bundle exec appraisal install`
-2. `bundle exec appraisal rake test`
+```
+export RAILS_VERSION=7.0
+export DB_GEM=sqlite3
+bundle install
+bundle exec rspec
+```
