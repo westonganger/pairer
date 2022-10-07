@@ -10,7 +10,7 @@ module Pairer
         end
 
       elsif request.method == "POST"
-        if Pairer.allowed_org_ids.include?(params[:org_id]&.downcase)
+        if Pairer.config.allowed_org_ids.include?(params[:org_id]&.downcase)
           session[:pairer_current_org_id] = params[:org_id].downcase
           redirect_to boards_path
         end

@@ -20,12 +20,16 @@ gem 'pairer', git: 'https://github.com/westonganger/pairer'
 ```ruby
 ### config/initializers/pairer.rb
 
-#Pairer.max_iterations_to_track = 100 # Default 100
+Pairer.config do |config|
+  config.salt = "Fy@%p0L^$Je6Ybc9uAjNU&T@" ### Dont lose this, this is used to generate public_ids for your records using hash_ids gem
 
-Pairer.allowed_org_ids = ["example-org", "other-example-org"]
+  config.allowed_org_ids = ["example-org", "other-example-org"]
 
-### OR something more secure, for example
-Pairer.allowed_org_ids = ["pXtHe7YUW0@Wo$H3V*s6l4N5"]
+  ### OR something more secure, for example
+  config.allowed_org_ids = ["pXtHe7YUW0@Wo$H3V*s6l4N5"]
+
+  #config.max_iterations_to_track = 100 # Defaults to 100
+end
 ```
 
 ### Option A: Configure as a sub-path
@@ -62,7 +66,7 @@ end
 
 Authentication models is as follows:
 
-1. Your main app defines a list of `Pairer.allowed_org_ids`. When an unauthenticated user visits the site they are taken to the sign-in page. On this page they are required to enter an "Organization ID" if they enter one of the `Pairer.allowed_org_ids` then they are signed-in to pairer and all boards will be scoped accordingly.
+1. Your main app defines a list of `Pairer.config.allowed_org_ids`. When an unauthenticated user visits the site they are taken to the sign-in page. On this page they are required to enter an "Organization ID" if they enter one of the `Pairer.config.allowed_org_ids` then they are signed-in to pairer and all boards will be scoped accordingly.
 
 2. After the user is signed-in via #1 above, then the user can either A. access existing board by entering the boards password, or B. create a new board by defining a board password.
 
@@ -81,7 +85,7 @@ Rack::Attack.throttle('limit unauthorized non-get requests', limit: 5, period: 1
     subdomain = req.host.split('.').first
     site_is_pairer = subdomain&.casecmp?("pairer") ### Replace this with whatever logic is applicable to your app
 
-    if !Pairer.allowed_org_ids.include?(req.session[:pairer_current_org_id])
+    if !Pairer.config.allowed_org_ids.include?(req.session[:pairer_current_org_id])
       ### Not signed-in to Pairer
       req.ip
     end

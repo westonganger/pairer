@@ -1,1 +1,1 @@
-Pairer.allowed_org_ids = ["example-org"]
+Pairer.config.allowed_org_ids = ["example-org"]

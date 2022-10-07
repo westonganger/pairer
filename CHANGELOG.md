@@ -1,5 +1,12 @@
 # CHANGELOG
 
+### Oct 7, 2022
+- Remove unnecessary JS libraries
+- Add `Pairer.config`
+- Change `Pairer.allowed_org_ids` to `Pairer.config.allowed_org_ids`
+- Change `Pairer.max_number_of_iterations` to `Pairer.config.max_number_of_iterations`
+- Add `Pairer.config.hash_id_salt` to ensure apps can customize their public_id generation
+
 ### September 12, 2022
 - Ensure roles dont allow duplicates with uppercase/lowercase
 - Ensure persons name uniqueness validation is case-insensitive
@@ -28,7 +35,7 @@
 - Add namespace/prefix for session variables to avoid conflicts
 - Rename org_name --> org_id
   * Organization Name --> Organization ID
-  * Pairer.allowed_org_names --> Pairer.allowed_org_ids
+  * Pairer.allowed_org_names --> Pairer.config.allowed_org_ids
   * pairer_boards.org_name --> pairer_boards.org_id
   * To upgrade from a previous version, add the following to your `config/initializers/pairer.rb`
     * `require Pairer.root.join("app/models/pairer/board"); ActiveRecord::Migration.new.rename_column(:pairer_boards, :org_name, :org_id) if Pairer::Board.column_names.include?("org_name")`

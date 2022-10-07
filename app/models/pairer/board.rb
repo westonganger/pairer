@@ -7,10 +7,10 @@ module Pairer
     has_many :groups, class_name: "Pairer::Group", dependent: :destroy
 
     validates :name, presence: true
-    validates :org_id, presence: true, inclusion: {in: ->(x){ Pairer.allowed_org_ids }}
+    validates :org_id, presence: true, inclusion: {in: ->(x){ Pairer.config.allowed_org_ids }}
     validates :password, presence: true, uniqueness: {message: "invalid password, please use a different one", scope: :org_id}
     validates :current_iteration_number, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-    validates :num_iterations_to_track, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: ->(x){ Pairer.max_iterations_to_track } }
+    validates :num_iterations_to_track, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: ->(x){ Pairer.config.max_iterations_to_track } }
     validates :group_size, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
     before_validation on: :create do

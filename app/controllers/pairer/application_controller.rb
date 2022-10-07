@@ -28,7 +28,7 @@ module Pairer
 
     def signed_in?
       if session[:pairer_current_org_id].present?
-        Pairer.allowed_org_ids.collect(&:downcase).include?(session[:pairer_current_org_id].downcase)
+        Pairer.config.allowed_org_ids.collect(&:downcase).include?(session[:pairer_current_org_id].downcase)
       end
     end
 
