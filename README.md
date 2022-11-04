@@ -21,7 +21,7 @@ gem 'pairer', git: 'https://github.com/westonganger/pairer'
 ### config/initializers/pairer.rb
 
 Pairer.config do |config|
-  config.salt = "Fy@%p0L^$Je6Ybc9uAjNU&T@" ### Dont lose this, this is used to generate public_ids for your records using hash_ids gem
+  config.hash_id_salt = "Fy@%p0L^$Je6Ybc9uAjNU&T@" ### Dont lose this, this is used to generate public_ids for your records using hash_ids gem
 
   config.allowed_org_ids = ["example-org", "other-example-org"]
 

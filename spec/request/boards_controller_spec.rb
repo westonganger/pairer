@@ -127,6 +127,23 @@ RSpec.describe Pairer::BoardsController, type: :request do
       assert_equal(response.status, 200)
       assert(response.body.include?("Shuffle"))
     end
+
+    it "renders correctly after a user has been deleted" do
+      3.times.each do |i|
+        @board.people.create!(name: i)
+      end
+
+      @board.shuffle!
+
+      expect(@board.stats).not_to be_empty
+
+      @board.people.first.destroy!
+
+      get pairer.board_path(@board)
+      assert_equal(response.status, 200)
+
+      expect(response.body).to include("Person Removed")
+    end
   end
 
   it "update" do

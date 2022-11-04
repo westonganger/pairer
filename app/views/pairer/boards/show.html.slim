@@ -79,7 +79,7 @@
 
           - stats.each do |person_ids, count|
             tr
-              td = person_ids.map{|person_id| people_by_id[person_id]&.name }.sort.join(", ")
+              td = person_ids.map{|person_id| people_by_id[person_id]&.name || "<Person Removed>" }.sort.join(", ")
               td.text-center = count
 
     - if Rails.env.development?

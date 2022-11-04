@@ -82,7 +82,7 @@ module Pairer
 
             new_groups << new_group
 
-            available_person_ids = (available_person_ids - g.person_ids_array)
+            available_person_ids = (available_person_ids - group_locked_person_ids)
           end
         end
       end

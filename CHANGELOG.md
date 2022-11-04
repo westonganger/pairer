@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### November 3, 2022
+
+- Fix exception on boards#show page after people are deleted
+- Dont add new person to list in JS when not created successfully
+- Fix issue with shuffle and groups with locked person(s)
+
 ### Oct 7, 2022
 - Remove unnecessary JS libraries
 - Add `Pairer.config`
