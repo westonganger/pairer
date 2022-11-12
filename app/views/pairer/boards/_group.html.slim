@@ -1,8 +1,10 @@
 tr.group-row data-group-id=group.public_id
   td.text-center
     .space-above2
-      = link_to lock_group_board_path(@board, group_id: group), data: {method: :post}, remote: true, class: 'btn btn-xs btn-default group-lock-btn', title: "Group #{group.locked? ? "Locked" : "Unlocked"}" do
+      = link_to lock_group_board_path(@board, group_id: group), data: {method: :post}, remote: true, class: "btn btn-xs group-lock-btn #{group.locked? ? 'btn-highlight' : 'btn-default'}", title: "Group #{group.locked? ? "Locked" : "Unlocked"}" do
         i class=(group.locked? ? 'icon-lock' : 'icon-unlock')
+        - if group.locked?
+          = " Locked"
 
       = link_to delete_group_board_path(@board, group_id: group), data: {method: :delete}, remote: true, class: 'btn btn-xs space-left2 group-sweep-btn', title: "Sweep" do
         = render "pairer/shared/svg/broom"

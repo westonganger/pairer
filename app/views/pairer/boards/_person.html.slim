@@ -1,7 +1,7 @@
 span.person data-person-id=person.public_id
   = person.name
 
-  = link_to lock_person_board_path(@board, person_id: person), data: {method: :post}, remote: true, class: 'btn btn-xs btn-default space-left2', title: "#{person.locked? ? "Locked" : "Unlocked"}" do
+  = link_to lock_person_board_path(@board, person_id: person), data: {method: :post}, remote: true, class: "btn btn-xs space-left2 #{person.locked? ? 'btn-highlight' : 'btn-default'}", title: "#{person.locked? ? "Locked" : "Unlocked"}" do
     i class=(person.locked? ? 'icon-lock' : 'icon-unlock')
 
   span.space-left.delete

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### November 11, 2022
+
+- Improve highlighting for lock buttons on locked people and groups
+- Change colors of sweep button
+- Add missing Javascript DOM manipulations after "Sweep" action
+
 ### November 3, 2022
 
 - Fix exception on boards#show page after people are deleted

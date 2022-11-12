@@ -40,13 +40,13 @@
         span Add Group
 
     .text-center.space-below3 style="margin-top: -53px;"
-      = link_to shuffle_board_path(@board), class: "btn btn-success space-left4", data: {method: :post} do
+      = link_to shuffle_board_path(@board), class: "btn btn-success", data: {method: :post} do
         i.icon-refresh.space-right
         span Shuffle
 
     table.table-bordered.table
       thead
-        th style="width: 80px;"
+        th.text-center style="width: 130px;"
           = link_to shuffle_board_path(@board), class: "btn btn-success btn-sm", data: {method: :post} do
             i.icon-refresh.space-right
             span Shuffle
@@ -61,34 +61,7 @@
         i.icon-plus.space-right
         span Add Group
 
-    h3.space-above5
-      .pull-left Stats
-      = link_to "Reset Stats and Groups", board_path(@board, clear_board: true), class: 'btn btn-danger btn-sm space-left2', data: {method: :patch}
-
-    - stats = @board.stats
-
-    - if stats.empty?
-      p Cannot show stats with only 1 person on the board
-    - else
-      table.table.table-condensed.table-bordered#stats style="max-width: 400px;"
-        thead
-          th Pair
-          th style="width: 90px;" Count
-        tbody
-          - people_by_id = @board.people.map{|x| [x.to_param, x] }.to_h
-
-          - stats.each do |person_ids, count|
-            tr
-              td = person_ids.map{|person_id| people_by_id[person_id]&.name || "<Person Removed>" }.sort.join(", ")
-              td.text-center = count
-
-    - if Rails.env.development?
-      .well.space-above5
-        h4 Debug Info
-
-        = "Number of Tracked Groups: #{@board.tracked_groups.size}"
-        br
-        = "Tracked Groups Iteration Numbers: #{@board.tracked_groups.collect(&:board_iteration_number).uniq.join(", ")}"
+    = render 'stats'
 
   .col-sm-3
     .well.space-above3.board-roles-container
@@ -142,17 +115,27 @@ css:
   }
 
   .group-sweep-btn{
-    background-color: orange;
+    background-color: none;
     color: #333;
     padding: 3px 5px;
     line-height: 1;
     font-size: 20px;
+    border: 1px solid #999;
   }
   .group-sweep-btn:hover{
-    background-color: darkorange;
+    background-color: #ede175;
+    color: #333;
   }
   .group-lock-btn{
     padding: 5px 9px;
+  }
+
+  .btn-highlight{
+    background-color: orange;
+    color: white;
+  }
+  .btn-highlight:hover{
+    background-color: darkorange;
   }
 
 javascript:

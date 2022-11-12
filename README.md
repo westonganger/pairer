@@ -85,7 +85,7 @@ Rack::Attack.throttle('limit unauthorized non-get requests', limit: 5, period: 1
     subdomain = req.host.split('.').first
     site_is_pairer = subdomain&.casecmp?("pairer") ### Replace this with whatever logic is applicable to your app
 
-    if !Pairer.config.allowed_org_ids.include?(req.session[:pairer_current_org_id])
+    if site_is_pairer && !Pairer.config.allowed_org_ids.include?(req.session[:pairer_current_org_id])
       ### Not signed-in to Pairer
       req.ip
     end
