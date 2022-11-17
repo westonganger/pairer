@@ -14,10 +14,10 @@ module Pairer
     validates :group_size, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
     before_validation on: :create do
-      self.name = "New Board"
-      self.current_iteration_number = 0
-      self.num_iterations_to_track = 15
-      self.group_size = 2
+      self.name ||= "New Board"
+      self.current_iteration_number ||= 0
+      self.num_iterations_to_track ||= 15
+      self.group_size ||= 2
     end
 
     def current_groups

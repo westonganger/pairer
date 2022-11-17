@@ -1,13 +1,14 @@
 # CHANGELOG
 
-### November 11, 2022
+### November 17, 2022
+- Add "Recently Accessed Boards" stored in session variable
 
+### November 11, 2022
 - Improve highlighting for lock buttons on locked people and groups
 - Change colors of sweep button
 - Add missing Javascript DOM manipulations after "Sweep" action
 
 ### November 3, 2022
-
 - Fix exception on boards#show page after people are deleted
 - Dont add new person to list in JS when not created successfully
 - Fix issue with shuffle and groups with locked person(s)

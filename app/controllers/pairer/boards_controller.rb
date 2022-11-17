@@ -15,11 +15,13 @@ module Pairer
     def index
       if params[:password].present?
         @board = Pairer::Board.find_by(org_id: session[:pairer_current_org_id], password: params[:password])
+
         if @board
           session[:pairer_current_board_id] = @board.to_param
           redirect_to action: :show, id: session[:pairer_current_board_id]
         else
           flash.now.alert = "Board not found."
+
           render
         end
       end
@@ -47,6 +49,13 @@ module Pairer
     end
 
     def show
+      session_key = :pairer_board_access_list
+
+      access_list = session[session_key] || {}
+
+      access_list[@board.public_id] = Time.now.to_s
+
+      session[session_key] = access_list
     end
 
     def update

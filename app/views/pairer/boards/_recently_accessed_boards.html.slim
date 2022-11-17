@@ -1,0 +1,26 @@
+- session_key = :pairer_board_access_list
+
+- if session[session_key]
+  - begin
+    - access_list_by_time = session[session_key].to_a.sort_by{|_id,time| Time.parse(time)}.reverse.to_h
+
+    - if access_list_by_time.any?
+      - access_list_by_time.each do |id, time|
+        - if Time.parse(time) < 30.days.ago
+          - session[session_key] = access_list_by_time = access_list_by_time.except(id)
+
+      - boards = Pairer::Board.where(org_id: session[:pairer_current_org_id], public_id: access_list_by_time.keys).map{|x| [x.public_id, x]}.to_h
+
+      - if boards.any?
+        .recently-accessed-boards.well.well-sm.space-above5
+          h1.space-above Recently Accessed Boards
+
+          ul style="list-style: none; padding-left: 0"
+            - access_list_by_time.each do |public_id, _time|
+              - board = boards[public_id]
+
+              - if board
+                li style="margin-top: 10px;" = link_to "#{board.name}", pairer.board_path(public_id), style: "color: #333; text-decoration: underline;"
+  - rescue => e
+    - session.delete(session_key)
+    - raise(e)

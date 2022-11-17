@@ -39,32 +39,50 @@ RSpec.describe Pairer::BoardsController, type: :request do
     logout
   end
 
-  it "index" do
-    ### Test signed in
-    get pairer.boards_path
-    assert_equal(response.status, 200)
-    assert(response.body.include?("Find Board"))
+  context "index" do
+    it "works signed in and out" do
+      ### Test signed in
+      get pairer.boards_path
+      assert_equal(response.status, 200)
+      assert(response.body.include?("Find Board"))
 
-    logout
+      logout
 
-    ### Test signed out
-    get pairer.boards_path
-    assert_equal(response.status, 302)
-    assert_redirected_to pairer.sign_in_path
-  end
+      ### Test signed out
+      get pairer.boards_path
+      assert_equal(response.status, 302)
+      assert_redirected_to pairer.sign_in_path
+    end
 
-  it "index with invalid org_id" do
-    bad_org_id = "something-invalid"
+    it "handles invalid org_id" do
+      bad_org_id = "something-invalid"
 
-    allow(Pairer.config).to receive(:allowed_org_ids).and_return([bad_org_id])
-    post pairer.sign_in_path, params: {org_id: org_id}
-    assert_equal(response.status, 302)
-    assert_redirected_to pairer.boards_path
+      allow(Pairer.config).to receive(:allowed_org_ids).and_return([bad_org_id])
+      post pairer.sign_in_path, params: {org_id: org_id}
+      assert_equal(response.status, 302)
+      assert_redirected_to pairer.boards_path
 
-    allow(Pairer.config).to receive(:allowed_org_ids).and_call_original
-    get pairer.boards_path
-    assert_equal(response.status, 302)
-    assert_redirected_to pairer.sign_in_path
+      allow(Pairer.config).to receive(:allowed_org_ids).and_call_original
+      get pairer.boards_path
+      assert_equal(response.status, 302)
+      assert_redirected_to pairer.sign_in_path
+    end
+
+    it "shows recently accessed boards" do
+      @board2 = Pairer::Board.create!(name: :board_2, password: :board_2, org_id: org_id)
+      @board3 = Pairer::Board.create!(name: :board_3, password: :board_3, org_id: org_id)
+      @board4 = Pairer::Board.create!(name: :board_4, password: :board_4, org_id: org_id)
+
+      get pairer.board_path(@board2)
+      get pairer.board_path(@board3)
+      get pairer.board_path(@board)
+
+      get pairer.boards_path
+      assert_equal(response.status, 200)
+
+      expect(Nokogiri::XML(response.body).css(".recently-accessed-boards li").size).to eq(3)
+      expect(Nokogiri::XML(response.body).css(".recently-accessed-boards li").map(&:text)).to contain_exactly(@board2.name, @board3.name, @board.name)
+    end
   end
 
   context "show" do
@@ -143,6 +161,14 @@ RSpec.describe Pairer::BoardsController, type: :request do
       assert_equal(response.status, 200)
 
       expect(response.body).to include("Person Removed")
+    end
+
+    it "saves to recently accessed boards" do
+      time = Time.now
+      get pairer.board_path(@board)
+      assert_equal(response.status, 200)
+      expect(request.session[:pairer_board_access_list]).to have_key(@board.public_id)
+      expect(request.session[:pairer_board_access_list][@board.public_id] > time)
     end
   end
 
