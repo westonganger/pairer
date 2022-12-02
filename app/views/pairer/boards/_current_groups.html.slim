@@ -1,0 +1,11 @@
+table.table-bordered.table.current-groups
+  thead
+    th.text-center style="width: 130px;"
+      = link_to shuffle_board_path(@board), class: "btn btn-success btn-sm", data: {method: :post} do
+        i.icon-refresh.space-right
+        span Shuffle
+    th style="width: 50%; padding-left: 25px;" People
+    th style="padding-left: 25px;" Roles
+  tbody
+    - @board.current_groups.each do |group|
+      = render "group", group: group

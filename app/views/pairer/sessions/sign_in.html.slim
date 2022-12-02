@@ -3,7 +3,8 @@
     h1.space-above Sign In
 
     = form_tag nil, method: :post, class: 'form-inline' do
-      label Organization ID
-      input.form-control type="password" name="org_id" autofocus=true
+      .form-group
+        label Organization ID
+        input.form-control type="password" name="org_id" autofocus=true
 
       button.btn.btn-sm.btn-success.space-left2 type="submit" Submit

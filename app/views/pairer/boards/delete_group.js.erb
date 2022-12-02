@@ -2,4 +2,6 @@ var group_row = $(".group-row[data-group-id=<%= @group.public_id %>]");
 
 $('.board-people-container').append(group_row.find(".person"));
 
+$('.roles-list').append(group_row.find(".role"));
+
 group_row.remove();

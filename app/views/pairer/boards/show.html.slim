@@ -20,14 +20,21 @@
       = @board.errors.full_messages.join("<br>").html_safe
   
   div
-    label Board Name
-    input.form-control.change-submit name="board[name]" value=@board.name style="width: 180px;"
+    .form-group
+      label Board Name
+      input.form-control.change-submit name="board[name]" value=@board.name style="width: 180px;"
 
-    span.space-left3
+    br.visible-xs
+    span.space-left3.hidden-xs
+
+    .form-group
       label Group Size
       input.form-control.change-submit name="board[group_size]" value=@board.group_size style="width: 50px;"
 
-    span.space-left3
+    br.visible-xs
+    span.space-left3.hidden-xs
+
+    .form-group
       label Number of Iterations to Track
       input.form-control.change-submit name="board[num_iterations_to_track]" value=@board.num_iterations_to_track style="width: 50px;"
 
@@ -44,26 +51,16 @@
         i.icon-refresh.space-right
         span Shuffle
 
-    table.table-bordered.table
-      thead
-        th.text-center style="width: 130px;"
-          = link_to shuffle_board_path(@board), class: "btn btn-success btn-sm", data: {method: :post} do
-            i.icon-refresh.space-right
-            span Shuffle
-        th style="width: 50%; padding-left: 25px;" People
-        th style="padding-left: 25px;" Roles
-      tbody
-        - @board.current_groups.each do |group|
-          = render "group", group: group
+    = render "current_groups"
 
     div
       = link_to create_group_board_path(@board), data: {method: :post}, remote: true, class: 'btn btn-sm btn-default' do
         i.icon-plus.space-right
         span Add Group
 
-    = render 'stats'
+    .hidden-xs = render 'stats'
 
-  .col-sm-3
+  .col-sm-3.unassigned-lists-container
     .well.space-above3.board-roles-container
       h3.space-above
         .pull-left.space-right3 Roles
@@ -94,6 +91,8 @@
 
           - @board.people.select{|x| group_person_ids.exclude?(x.public_id) }.sort_by{|x| x.name }.each do |person|
             = render 'person', person: person
+
+.visible-xs = render 'stats'
 
 css:
   .role, 
@@ -138,6 +137,15 @@ css:
     background-color: darkorange;
   }
 
+  @media (min-width: 768px){
+    .unassigned-lists-container{
+      min-width: 360px;
+    }
+    .groups-container{
+      max-width: calc(100% - 360px);
+    }
+  }
+
 javascript:
   $(function(){
 
@@ -151,73 +159,77 @@ javascript:
         item.closest("form").submit();
       }, 1);
     });
-  
-    $(".person-list").sortable({
-      connectWith: ".person-list",
-      items: "> .person",
-      revert: true,
-      update: function(){
-        var group_id = $(this).data('group-id');
-        var prev_person_ids = $(this).data('prev-person-ids');
 
-        var $el = $(this);
+    window.init_sortable_lists = function(){
+      $(".person-list").sortable({
+        connectWith: ".person-list",
+        items: "> .person",
+        revert: true,
+        update: function(){
+          var group_id = $(this).data('group-id');
+          var prev_person_ids = $(this).data('prev-person-ids');
 
-        if(group_id){
-          var person_ids = []
+          var $el = $(this);
 
-          $el.find('.person').each(function(i, item){
-            person_ids.push($(item).data('person-id'))
-          });
+          if(group_id){
+            var person_ids = []
 
-          if(!equals(prev_person_ids, person_ids)){
-            if(person_ids.length === 0){
-              person_ids.push(""); // to ensure empty array value make the params
-            }
-
-            $.ajax({
-              url: "#{update_group_board_path(@board, format: :js)}",
-              method: "POST",
-              data: {group_id: group_id, person_ids: person_ids},
-            }).done(function(){
-              $el.data('prev-person-ids', person_ids);
+            $el.find('.person').each(function(i, item){
+              person_ids.push($(item).data('person-id'))
             });
-          }
-        }
-      },
-    });
 
-    $(".roles-list").sortable({
-      connectWith: ".roles-list",
-      items: "> .role",
-      revert: true,
-      update: function(){
-        var group_id = $(this).data('group-id');
-        var prev_roles = $(this).data('prev-roles');
+            if(!equals(prev_person_ids, person_ids)){
+              if(person_ids.length === 0){
+                person_ids.push(""); // to ensure empty array value make the params
+              }
 
-        $el = $(this);
-
-        if(group_id){
-          var roles = [];
-
-          $el.find('.role').each(function(i, item){
-            roles.push($(item).data('role-name'))
-          });
-
-          if(!equals(prev_roles, roles)){
-            if(roles.length === 0){
-              roles.push(""); // to ensure empty array value make the params
+              $.ajax({
+                url: "#{update_group_board_path(@board, format: :js)}",
+                method: "POST",
+                data: {group_id: group_id, person_ids: person_ids},
+              }).done(function(){
+                $el.data('prev-person-ids', person_ids);
+              });
             }
-
-            $.ajax({
-              url: "#{update_group_board_path(@board, format: :js)}",
-              method: "POST",
-              data: {group_id: group_id, roles: roles},
-            }).done(function(){
-              $el.data('prev-roles', roles);
-            });
           }
-        }
-      },
-    });
+        },
+      });
+
+      $(".roles-list").sortable({
+        connectWith: ".roles-list",
+        items: "> .role",
+        revert: true,
+        update: function(){
+          var group_id = $(this).data('group-id');
+          var prev_roles = $(this).data('prev-roles');
+
+          $el = $(this);
+
+          if(group_id){
+            var roles = [];
+
+            $el.find('.role').each(function(i, item){
+              roles.push($(item).data('role-name'))
+            });
+
+            if(!equals(prev_roles, roles)){
+              if(roles.length === 0){
+                roles.push(""); // to ensure empty array value make the params
+              }
+
+              $.ajax({
+                url: "#{update_group_board_path(@board, format: :js)}",
+                method: "POST",
+                data: {group_id: group_id, roles: roles},
+              }).done(function(){
+                $el.data('prev-roles', roles);
+              });
+            }
+          }
+        },
+      });
+    };
+
+    window.init_sortable_lists();
 
   });

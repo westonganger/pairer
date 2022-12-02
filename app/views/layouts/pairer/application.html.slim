@@ -28,17 +28,18 @@ html
     nav.navbar.navbar-inverse.navbar-fixed-top
       .container-fluid
         .navbar-header
+          i.fa.fa-bars.navbar-toggle.visible-sm.visible-xs style="color: white; cursor: pointer;"  data-toggle="collapse" data-target="#nav" title="Show/Hide Menu"
           h1.hidden = @title
-
           a.navbar-brand href=root_path = "#{@title}"
 
-        - if signed_in?
-          ul.nav.navbar-nav
-            li class=('active' if params[:action] == "index")
-              a href=boards_path Find Board
-            - if @board
-              li.active
-                a href=board_path(@board) View Board
+        .navbar-collapse.collapse#nav
+          - if signed_in?
+            ul.nav.navbar-nav
+              li class=('active' if params[:action] == "index")
+                a href=boards_path Find Board
+              - if @board
+                li.active
+                  a href=board_path(@board) View Board
 
           ul.nav.navbar-nav.navbar-right
             li

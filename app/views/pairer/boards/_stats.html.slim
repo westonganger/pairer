@@ -1,32 +1,33 @@
-h3.space-above5
-  .pull-left
-    | Stats
-  = link_to "Reset Stats and Groups", board_path(@board, clear_board: true), class: 'btn btn-danger btn-sm space-left2', data: {method: :patch}
+.stats
+  h3.space-above5
+    .pull-left
+      | Stats
+    = link_to "Reset Stats and Groups", board_path(@board, clear_board: true), class: 'btn btn-danger btn-sm space-left2', data: {method: :patch}
 
-p
-  small = "Statistics will only consider last #{@board.num_iterations_to_track} iterations"
+  p
+    small = "Statistics will only consider last #{@board.num_iterations_to_track} iterations"
 
-- stats = @board.stats
+  - stats = @board.stats
 
-- if stats.empty?
-  p Cannot show stats with only 1 person on the board
-- else
-  table.table.table-condensed.table-bordered#stats style="max-width: 400px;"
-    thead
-      th Pair
-      th style="width: 90px;" Count
-    tbody
-      - people_by_id = @board.people.map{|x| [x.to_param, x] }.to_h
+  - if stats.empty?
+    p Cannot show stats with only 1 person on the board
+  - else
+    table.table.table-condensed.table-bordered#stats style="max-width: 400px;"
+      thead
+        th Pair
+        th style="width: 90px;" Count
+      tbody
+        - people_by_id = @board.people.map{|x| [x.to_param, x] }.to_h
 
-      - stats.each do |person_ids, count|
-        tr
-          td = person_ids.map{|person_id| people_by_id[person_id]&.name || "<Person Removed>" }.sort.join(", ")
-          td.text-center = count
+        - stats.each do |person_ids, count|
+          tr
+            td = person_ids.map{|person_id| people_by_id[person_id]&.name || "<Person Removed>" }.sort.join(", ")
+            td.text-center = count
 
-- if Rails.env.development?
-  .well.space-above5
-    h4 Debug Info
+  - if Rails.env.development?
+    .well.space-above5
+      h4 Debug Info
 
-    = "Number of Tracked Groups: #{@board.tracked_groups.size}"
-    br
-    = "Tracked Groups Iteration Numbers: #{@board.tracked_groups.collect(&:board_iteration_number).uniq.join(", ")}"
+      = "Number of Tracked Groups: #{@board.tracked_groups.size}"
+      br
+      = "Tracked Groups Iteration Numbers: #{@board.tracked_groups.collect(&:board_iteration_number).uniq.join(", ")}"

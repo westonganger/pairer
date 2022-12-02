@@ -1,5 +1,10 @@
 # CHANGELOG
 
+### Dec 6, 2022
+- Update stats when groups have not changed in last hour
+- Fix drag-and-drop after creating new group
+- CSS fixes for smaller screen widths
+
 ### November 17, 2022
 - Add "Recently Accessed Boards" stored in session variable
 

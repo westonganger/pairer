@@ -1,3 +1,3 @@
 #!/usr/bin/env ruby
 
-`cd spec/dummy/ && bundle exec rails s`
+system("cd spec/dummy/ && bundle exec rails s --binding 0.0.0.0", out: STDOUT)
