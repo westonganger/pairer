@@ -1,8 +1,8 @@
-# Pairer Engine
+# Pairer
 
 <a href='https://github.com/westonganger/pairer/actions' target='_blank'><img src="https://github.com/westonganger/pairer/workflows/Tests/badge.svg" style="max-width:100%;" height='21' style='border:0px;height:21px;' border='0' alt="CI Status"></a>
 
-This is a Rails app/engine to help you to easily rotate and keep track of working pairs. For example its great for pair-programming teams.
+Pairer is a Rails app/engine to help you to easily generate and rotate pairs within a larger group. For example its great for pair programming teams where you want to work with someone new everyday.
 
 Each organization has many boards. Within each Board you can create people and roles. The tool will allow for automated and manually assignments of people and roles to working groups within the board.
 
