@@ -1,9 +1,5 @@
-<% if @reload %>
-  window.location.reload();
-<% else %>
-  $('#flash-container').html("<%= j render partial: 'pairer/shared/flash' %>");
+$('#flash-container').html("<%= j render partial: 'pairer/shared/flash' %>");
 
-  <%= yield %>
+<%= yield %>
 
-  window.init();
-<% end %>
+window.init();

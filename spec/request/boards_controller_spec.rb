@@ -264,76 +264,40 @@ RSpec.describe Pairer::BoardsController, type: :request do
     end
   end
 
-  context "update_group" do
-    it "works normally" do
-      @group = @board.groups.create!(board_iteration_number: @board.current_iteration_number)
+  it "update_group" do
+    @group = @board.groups.create!(board_iteration_number: @board.current_iteration_number)
 
-      roles = ["bar", "foo"]
+    roles = ["bar", "foo"]
 
-      ### Invalid Roles
-      post pairer.update_group_board_path(@board, group_id: @group.to_param, roles: roles)
-      assert_equal(response.status, 302)
-      assert_redirected_to pairer.board_path(@board)
-      assert_equal @group.reload.roles_array, []
+    ### Invalid Roles
+    post pairer.update_group_board_path(@board, group_id: @group.to_param, roles: roles)
+    assert_equal(response.status, 302)
+    assert_redirected_to pairer.board_path(@board)
+    assert_equal @group.reload.roles_array, []
 
-      ### Invalid Person Ids
-      post pairer.update_group_board_path(@board, group_id: @group.to_param, person_ids: ["foo", "bar"])
-      assert_equal(response.status, 302)
-      assert_redirected_to pairer.board_path(@board)
-      assert_equal @group.reload.person_ids_array, []
+    ### Invalid Person Ids
+    post pairer.update_group_board_path(@board, group_id: @group.to_param, person_ids: ["foo", "bar"])
+    assert_equal(response.status, 302)
+    assert_redirected_to pairer.board_path(@board)
+    assert_equal @group.reload.person_ids_array, []
 
-      @board.update!(roles: roles)
+    @board.update!(roles: roles)
 
-      ### Valid Roles
-      post pairer.update_group_board_path(@board, group_id: @group.to_param, roles: roles)
-      assert_equal(response.status, 302)
-      assert_redirected_to pairer.board_path(@board)
-      assert_equal @group.reload.roles_array, roles.sort
+    ### Valid Roles
+    post pairer.update_group_board_path(@board, group_id: @group.to_param, roles: roles)
+    assert_equal(response.status, 302)
+    assert_redirected_to pairer.board_path(@board)
+    assert_equal @group.reload.roles_array, roles.sort
 
-      person = @board.people.create!(name: "Abby")
+    person = @board.people.create!(name: "Abby")
 
-      person_ids = [person.public_id]
+    person_ids = [person.public_id]
 
-      ### Valid Person Ids
-      post pairer.update_group_board_path(@board, group_id: @group.to_param, person_ids: person_ids)
-      assert_equal(response.status, 302)
-      assert_redirected_to pairer.board_path(@board)
-      assert_equal @group.reload.person_ids_array, person_ids
-    end
-
-    it "increments the board number after 1 hour" do
-      orig_group = @board.groups.create!(board_iteration_number: @board.current_iteration_number)
-      prev_group_person_ids = orig_group.person_ids_array
-
-      @board.people.create!(name: "foo")
-      @board.people.create!(name: "bar")
-
-      @board.current_groups.update_all(updated_at: 1.hours.ago)
-
-      person_ids = @board.people.map(&:public_id)
-
-      prev_groups_size = @board.groups.size
-      prev_iteration_number = @board.current_iteration_number
-
-      post pairer.update_group_board_path(@board, group_id: orig_group.to_param, person_ids: person_ids)
-      expect(response.status).to eq(302)
-
-      @board.reload
-      orig_group.reload
-
-      expect(@board.current_groups.size).to eq(@board.groups.where(board_iteration_number: prev_iteration_number).size)
-      
-      expect(@board.groups.size).to eq(prev_groups_size+@board.current_groups.size)
-
-      expect(@board.current_iteration_number).to eq(prev_iteration_number+1)
-
-      expect(@board.current_groups.map(&:board_iteration_number).uniq).to eq([prev_iteration_number+1])
-
-      expect(assigns(:group).board_iteration_number).to eq(@board.current_iteration_number)
-      expect(assigns(:group).person_ids_array).to eq(person_ids)
-
-      expect(orig_group.person_ids_array).to eq(prev_group_person_ids)
-    end
+    ### Valid Person Ids
+    post pairer.update_group_board_path(@board, group_id: @group.to_param, person_ids: person_ids)
+    assert_equal(response.status, 302)
+    assert_redirected_to pairer.board_path(@board)
+    assert_equal @group.reload.person_ids_array, person_ids
   end
 
   it "lock_group" do

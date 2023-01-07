@@ -1,5 +1,8 @@
 # CHANGELOG
 
+### Jan 6, 2023
+- Revert: Update stats when groups have not changed in last hour
+
 ### Dec 6, 2022
 - Update stats when groups have not changed in last hour
 - Fix drag-and-drop after creating new group

@@ -136,8 +136,6 @@ module Pairer
     def create_group
       @group = @board.groups.create!(board_iteration_number: @board.current_iteration_number)
 
-      increment_before_group_change
-
       if request.format.js?
         render
       else
@@ -147,8 +145,6 @@ module Pairer
 
     def lock_group
       @group = @board.groups.find_by!(public_id: params.require(:group_id))
-
-      increment_before_group_change
 
       @group.toggle!(:locked)
 
@@ -161,8 +157,6 @@ module Pairer
 
     def delete_group
       @group = @board.groups.find_by!(public_id: params.require(:group_id))
-
-      increment_before_group_change
 
       @group.destroy!
 
@@ -180,18 +174,6 @@ module Pairer
         person_ids: (params[:person_ids] if params[:person_ids].present?),
         roles: (params[:roles] if params[:roles].present?),
       }.compact
-
-      if @group.board_iteration_number == @board.current_iteration_number-1
-        match = @board.current_groups.detect{|x| x.roles_array == @group.roles_array && x.person_ids_array == @group.person_ids_array }
-
-        if match
-          match.update!(attrs)
-        else
-          raise "Invalid board iteration number, cannot find match"
-        end
-      elsif attrs.present?
-        increment_before_group_change
-      end
 
       @group.update!(attrs)
 
@@ -214,32 +196,6 @@ module Pairer
 
     def people_by_id
       @people_by_id ||= @board.people.map{|x| [x.to_param, x] }.to_h
-    end
-
-    def increment_before_group_change
-      time_ago = 1.hour.ago
-
-      last_group_update = @board.current_groups.maximum(:updated_at)
-
-      if last_group_update && last_group_update <= time_ago
-        this_group_index = nil
-
-        new_groups = @board.current_groups.map.with_index{|x,i| 
-          if x.public_id == @group.public_id
-            this_group_index = i
-          end
-
-          x.dup
-        }
-
-        @board.increment!(:current_iteration_number)
-
-        new_groups.each{|x| x.assign_attributes(public_id: nil, board_iteration_number: @board.current_iteration_number); x.save!}
-
-        @group = new_groups[this_group_index]
-
-        @reload = true
-      end
     end
 
   end
