@@ -1,5 +1,8 @@
 # CHANGELOG
 
+### Feb 10, 2023
+-Fix issue with dragging items within a group after lock/unlock
+
 ### Jan 6, 2023
 - Revert: Update stats when groups have not changed in last hour
 

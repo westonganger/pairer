@@ -1,1 +1,1 @@
-$(".group-row[data-group-id=<%= @group.public_id %>]").replaceWith("<%= j render "group", group: @group %>")
+$(".group-row[data-group-id=<%= @group.public_id %>] .group-lock-btn").replaceWith("<%= j render "group_lock_button", group: @group %>");

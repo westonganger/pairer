@@ -18,7 +18,7 @@
     .well.well-sm
       div.bold Errors:
       = @board.errors.full_messages.join("<br>").html_safe
-  
+
   div
     .form-group
       label Board Name
@@ -40,7 +40,7 @@
 
 .row
   .col-sm-9.groups-container
-    h3 
+    h3
       .pull-left.space-right2 Groups
       = link_to create_group_board_path(@board), data: {method: :post}, remote: true, class: 'btn btn-sm btn-default' do
         i.icon-plus.space-right
@@ -71,9 +71,10 @@
           span.space-left
             button.btn.btn-sm.btn-default type="submit" Add
 
-      .roles-list style="min-height: 25px;"
-        - group_roles = @board.current_groups.flat_map(&:roles_array)
-        - @board.roles_array.select{|x| group_roles.exclude?(x) }.each do |role|
+      - group_roles = @board.current_groups.flat_map(&:roles_array)
+      - unassigned_roles = @board.roles_array - group_roles
+      .roles-list data-prev-roles=unassigned_roles style="min-height: 25px;"
+        - unassigned_roles.each do |role|
           = render 'role', role: role
 
       .board-people-container
@@ -86,16 +87,16 @@
             span.space-left
               button.btn.btn-sm.btn-default type="submit" Add
 
-        .person-list style="min-height: 40px;"
-          - group_person_ids = @board.current_groups.flat_map(&:person_ids_array)
-
-          - @board.people.select{|x| group_person_ids.exclude?(x.public_id) }.sort_by{|x| x.name }.each do |person|
+        - group_person_ids = @board.current_groups.flat_map(&:person_ids_array)
+        - unassigned_people = @board.people.select{|x| group_person_ids.exclude?(x.public_id) }.sort_by{|x| x.name }
+        .person-list data-prev-person-ids=unassigned_people.map(&:public_id) style="min-height: 40px;"
+          - unassigned_people.each do |person|
             = render 'person', person: person
 
 .visible-xs = render 'stats'
 
 css:
-  .role, 
+  .role,
   .person{
     display: inline-block;
     border: 1px solid black;
@@ -105,7 +106,7 @@ css:
     line-height: 40px;
     cursor: grab;
 
-    box-shadow: 4px 4px rgba(0,0,0, 0.2); 
+    box-shadow: 4px 4px rgba(0,0,0, 0.2);
   }
 
   .groups-container .person .delete,
@@ -171,27 +172,32 @@ javascript:
 
           var $el = $(this);
 
-          if(group_id){
-            var person_ids = []
-
-            $el.find('.person').each(function(i, item){
-              person_ids.push($(item).data('person-id'))
-            });
-
-            if(!equals(prev_person_ids, person_ids)){
-              if(person_ids.length === 0){
-                person_ids.push(""); // to ensure empty array value make the params
-              }
-
-              $.ajax({
-                url: "#{update_group_board_path(@board, format: :js)}",
-                method: "POST",
-                data: {group_id: group_id, person_ids: person_ids},
-              }).done(function(){
-                $el.data('prev-person-ids', person_ids);
-              });
-            }
+          if(!group_id){
+            // When on the unassigned list
+            return true; // true only skips ajax update, false cancels the entire item drag/move
           }
+
+          var person_ids = [];
+
+          $el.find('.person').each(function(i, item){
+            person_ids.push($(item).data('person-id'));
+          });
+
+          if(equals(prev_person_ids.sort(), person_ids.sort())){
+            return true; // true only skips ajax update, false cancels the entire item drag/move
+          }
+
+          if(person_ids.length === 0){
+            person_ids.push(""); // to ensure empty array value make the params
+          }
+
+          $.ajax({
+            url: "#{update_group_board_path(@board, format: :js)}",
+            method: "POST",
+            data: {group_id: group_id, person_ids: person_ids},
+          }).done(function(){
+            $el.data('prev-person-ids', person_ids);
+          });
         },
       });
 
@@ -205,27 +211,32 @@ javascript:
 
           $el = $(this);
 
-          if(group_id){
-            var roles = [];
-
-            $el.find('.role').each(function(i, item){
-              roles.push($(item).data('role-name'))
-            });
-
-            if(!equals(prev_roles, roles)){
-              if(roles.length === 0){
-                roles.push(""); // to ensure empty array value make the params
-              }
-
-              $.ajax({
-                url: "#{update_group_board_path(@board, format: :js)}",
-                method: "POST",
-                data: {group_id: group_id, roles: roles},
-              }).done(function(){
-                $el.data('prev-roles', roles);
-              });
-            }
+          if(!group_id){
+            // When on the unassigned list
+            return true; // true only skips ajax update, false cancels the entire item drag/move
           }
+
+          var roles = [];
+
+          $el.find('.role').each(function(i, item){
+            roles.push($(item).data('role-name'));
+          });
+
+          if(equals(prev_roles.sort(), roles.sort())){
+            return true; // true only skips ajax update, false cancels the entire item drag/move
+          }
+
+          if(roles.length === 0){
+            roles.push(""); // to ensure empty array value make the params
+          }
+
+          $.ajax({
+            url: "#{update_group_board_path(@board, format: :js)}",
+            method: "POST",
+            data: {group_id: group_id, roles: roles},
+          }).done(function(){
+            $el.data('prev-roles', roles);
+          });
         },
       });
     };
