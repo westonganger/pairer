@@ -1,7 +1,12 @@
 # CHANGELOG
 
+### Feb 18, 2023
+- Improve UX by disabling text selection when attempting to drag people/roles
+- Fix javascript UI bug on sweep where it would duplicate roles
+- Fix javascript UI bug on create person
+
 ### Feb 10, 2023
--Fix issue with dragging items within a group after lock/unlock
+- Fix issue with dragging items within a group after lock/unlock
 
 ### Jan 6, 2023
 - Revert: Update stats when groups have not changed in last hour
