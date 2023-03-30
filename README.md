@@ -4,7 +4,7 @@
 
 Pairer is a Rails app/engine to help you to easily generate and rotate pairs within a larger group. For example its great for pair programming teams where you want to work with someone new everyday.
 
-Each organization has many boards. Within each Board you can create people and roles. The tool will allow for automated and manually assignments of people and roles to working groups within the board.
+Each organization has many boards. Within each board you can create people and roles. The tool will allow for both automated and manual assignments of these resources to working groups within the board.
 
 ![Screenshot](/screenshot.png)
 
@@ -17,22 +17,8 @@ Developed as a Rails engine. So you can add to any existing app or create a bran
 gem 'pairer', git: 'https://github.com/westonganger/pairer'
 ```
 
-```ruby
-### config/initializers/pairer.rb
 
-Pairer.config do |config|
-  config.hash_id_salt = "Fy@%p0L^$Je6Ybc9uAjNU&T@" ### Dont lose this, this is used to generate public_ids for your records using hash_ids gem
-
-  config.allowed_org_ids = ["example-org", "other-example-org"]
-
-  ### OR something more secure, for example
-  config.allowed_org_ids = ["pXtHe7YUW0@Wo$H3V*s6l4N5"]
-
-  #config.max_iterations_to_track = 100 # Defaults to 100
-end
-```
-
-### Option A: Configure as a sub-path
+#### Option A: Mount to a path
 
 ```ruby
 ### config/routes.rb
@@ -44,7 +30,7 @@ mount Pairer::Engine, at: "/pairer", as: "pairer"
 mount Pairer::Engine, at: "/", as: "pairer"
 ```
 
-### Option B: Configure as a subdomain
+#### Option B: Mount as a subdomain
 
 ```ruby
 ### config/routes.rb
@@ -59,6 +45,22 @@ not_engine = Proc.new{|request| request.subdomain != pairer_subdomain }
 
 constraints not_engine do
   # your app routes here...
+end
+```
+
+### Configuration Options
+
+```ruby
+### config/initializers/pairer.rb
+
+Pairer.config do |config|
+  config.hash_id_salt = "Fy@%p0L^$Je6Ybc9uAjNU&T@" ### Dont lose this, this is used to generate public_ids for your records using hash_ids gem
+
+  config.allowed_org_ids = ["example-org", "other-example-org"]
+  ### OR something more secure, for example
+  config.allowed_org_ids = ["pXtHe7YUW0@Wo$H3V*s6l4N5"]
+
+  config.max_iterations_to_track = 100 # Defaults to 100
 end
 ```
 
