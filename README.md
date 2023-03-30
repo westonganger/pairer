@@ -37,8 +37,8 @@ mount Pairer::Engine, at: "/", as: "pairer"
 
 pairer_subdomain = "pairer"
 
-mount Pairer::Engine, 
-  at: "/", as: "pairer", 
+mount Pairer::Engine,
+  at: "/", as: "pairer",
   constraints: Proc.new{|request| request.subdomain == pairer_subdomain }
 
 not_engine = Proc.new{|request| request.subdomain != pairer_subdomain }
@@ -97,7 +97,16 @@ end
 
 ## Configuring Exception Handling
 
-If your app has a controller-concern named `ControllerExceptionsConcern` then Pairer will automatically pick this up and use it. For an example on how to implement a decent exception handler for your app please see the following blog article that I have written on the topic, https://westonganger.com/posts/properly-implement-error-exception-handling-for-your-rails-controllers
+If you want to add exception handling/notifications you can easily just add the behaviour directly to pairers application controller and do your custom exception handling logic. For example:
+
+```ruby
+Pairer::ApplicationController.class_eval do
+  rescue_from Exception do |exception|
+    ExceptionNotifier.notify_exception(exception)
+    render plain: "System error", status: 500
+  end
+end
+```
 
 ## Development
 

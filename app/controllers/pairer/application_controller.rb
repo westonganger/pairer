@@ -4,11 +4,6 @@ module Pairer
 
     helper_method :signed_in?
 
-    if defined?(::ControllerExceptionsConcern)
-      ### if defined in top-level application
-      include ::ControllerExceptionsConcern
-    end
-
     def robots
       str = <<~STR
         User-agent: *
@@ -30,12 +25,6 @@ module Pairer
       if session[:pairer_current_org_id].present?
         Pairer.config.allowed_org_ids.collect(&:downcase).include?(session[:pairer_current_org_id].downcase)
       end
-    end
-
-    private 
-
-    rescue_from ActiveRecord::RecordNotFound do |e|
-      raise ActionController::RoutingError.new('Not Found')
     end
 
   end

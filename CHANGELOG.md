@@ -1,5 +1,8 @@
 # CHANGELOG
 
+### Mar 29, 2023
+- Remove unnecessary controller exception handling
+
 ### Feb 18, 2023
 - Improve UX by disabling text selection when attempting to drag people/roles
 - Fix javascript UI bug on sweep where it would duplicate roles
