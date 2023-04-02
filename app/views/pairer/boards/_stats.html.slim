@@ -5,7 +5,11 @@
     = link_to "Reset Stats and Groups", board_path(@board, clear_board: true), class: 'btn btn-danger btn-sm space-left2', data: {method: :patch}
 
   p
-    small = "Statistics will only consider last #{@board.num_iterations_to_track} iterations"
+    = form_tag board_path(@board), method: :patch, class: 'form-inline space-above3' do
+      small
+        span.space-right Statistics will only consider last
+        input.form-control.change-submit name="board[num_iterations_to_track]" value=@board.num_iterations_to_track style="width: 40px; height: 30px; padding: 0 7px; text-align: center;"
+        span.space-left iterations
 
   - stats = @board.stats
 
