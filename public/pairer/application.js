@@ -1,6 +1,3 @@
-//= require rails-ujs
-//= require bootstrap-sprockets
-
 window.init = function(){
   $('form').attr('autocomplete', 'off');
 

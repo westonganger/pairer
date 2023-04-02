@@ -18,9 +18,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rails", ">= 5.0"
   spec.add_dependency "slim"
-  spec.add_dependency "sassc-rails"
-  spec.add_dependency "bootstrap-sass", "~>3.0"
-  spec.add_dependency "bootswatch-rails", "~>3.0"
   spec.add_dependency "hashids"
 
   spec.add_development_dependency "sqlite3"

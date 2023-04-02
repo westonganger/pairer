@@ -1,17 +1,4 @@
-/*
- *= require ./utility
- *= require_self
- */
-
-$my-navbar-height: 3.5em;
-
-@import "bootswatch/united/variables";
-
-$grid-float-breakpoint: 992px; // collapse for xs and sm devices */
-
-@import "bootstrap-sprockets";
-@import "bootstrap";
-@import "bootswatch/united/bootswatch";
+//$grid-float-breakpoint: 992px; // collapse for xs and sm devices */
 
 .badge-danger{
   background-color: $brand-danger !important;
@@ -20,19 +7,19 @@ $grid-float-breakpoint: 992px; // collapse for xs and sm devices */
 
 .navbar{
   font-size: 1.1em;
-  min-height: $my-navbar-height;
+  min-height: 3.5em;
 
   .navbar-brand{
     font-size: 1.5em;
     font-family: monospace;
-    padding: 8px 15px; 
+    padding: 8px 15px;
     &:hover{
       color: initial;
     }
   }
 
   .navbar-nav li a, .navbar-brand{
-    line-height: $my-navbar-height/2;
+    line-height: calc(3.5em/2);
   }
 }
 

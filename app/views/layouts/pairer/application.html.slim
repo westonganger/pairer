@@ -1,5 +1,6 @@
 - @title ||= 'Pairer'
-- @description ||= "A tool to help assign working pairs"
+
+- asset_version = `git show -s --format=%ci`.parameterize
 
 doctype html
 html
@@ -9,11 +10,17 @@ html
     = csrf_meta_tags
     meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0"
 
-    = favicon_link_tag "pairer/favicon.ico"
+    link rel="icon" type="image/x-icon" href=custom_asset_path("/pairer/favicon.ico")
 
-    = stylesheet_link_tag 'pairer/application', media: 'all'
-    
+    link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@3.4.1/united/bootstrap.min.css" integrity="sha256-ltLC53c+9nQc0ELY92pXXop0iDkRo4LeF9/FQ/JnXH0=" crossorigin="anonymous"
+
+    link rel="stylesheet" href=custom_asset_path("/pairer/utility.css")
+    link rel="stylesheet" href=custom_asset_path("/pairer/application.css")
+
     script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"
+
+    script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"
+    script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"
 
     link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css" integrity="sha512-IJ+BZHGlT4K43sqBGUzJ90pcxfkREDVZPZxeexRigVL8rzdw/gyJIflDahMdNzBww4k0WxpyaWpC2PLQUWmMUQ==" crossorigin="anonymous" referrerpolicy="no-referrer"
 
@@ -22,8 +29,8 @@ html
     link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" integrity="sha512-ELV+xyi8IhEApPS/pSj66+Jiw+sOT1Mqkzlh8ExXihe4zfqbWkxPRi8wptXIO9g73FSlhmquFlUOuMSoXz5IRw==" crossorigin="anonymous" referrerpolicy="no-referrer"
     script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js" integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"
 
-    = javascript_include_tag 'pairer/application'
-    
+    script src=custom_asset_path("/pairer/application.js")
+
   body
     nav.navbar.navbar-inverse.navbar-fixed-top
       .container-fluid

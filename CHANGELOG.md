@@ -2,6 +2,7 @@
 
 ### Apr 1, 2023
 - Move input for "Num Iterations to Track" to be inline with the stats description text
+- Remove sprockets dependency
 
 ### Mar 29, 2023
 - Remove unnecessary controller exception handling
