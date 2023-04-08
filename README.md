@@ -128,3 +128,7 @@ export DB_GEM=sqlite3
 bundle install
 bundle exec rspec
 ```
+
+# Credits
+
+Created & Maintained by [Weston Ganger](https://westonganger.com) - [@westonganger](https://github.com/westonganger)
