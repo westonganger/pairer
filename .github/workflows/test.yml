@@ -16,8 +16,6 @@ jobs:
       matrix:
         include:
           ### TEST ALL RUBY VERSIONS, USE DEFAULT GEMFILE
-          - ruby: 2.3
-          - ruby: 2.4
           - ruby: 2.5
           - ruby: 2.6
           - ruby: 2.7
@@ -58,8 +56,12 @@ jobs:
         bundler-cache: true
 
     - name: Run tests
+      env:
+        RAILS_ENV: test
       run: |
-        bundle exec rake
+        bundle exec rake db:create
+        bundle exec rake db:migrate
+        bundle exec rspec
 
 
   test_mysql:
@@ -113,10 +115,12 @@ jobs:
 
     - name: Run tests
       env:
-        DATABASE_URL: mysql2://root:password@127.0.0.1:3306/test
         RAILS_ENV: test
+        DATABASE_URL: mysql2://root:password@127.0.0.1:3306/test
       run: |
-        bundle exec rake
+        bundle exec rake db:create
+        bundle exec rake db:migrate
+        bundle exec rspec
 
 
   test_pg:
@@ -170,7 +174,9 @@ jobs:
 
     - name: Run tests
       env:
+        RAILS_ENV: "test"
         DATABASE_URL: postgres://postgres:password@localhost:5432/test
-        RAILS_ENV: test
       run: |
-        bundle exec rake
+        bundle exec rake db:create
+        bundle exec rake db:migrate
+        bundle exec rspec
