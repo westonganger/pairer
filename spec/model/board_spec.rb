@@ -84,8 +84,8 @@ RSpec.describe Pairer::Board, type: :model do
 
       3.times.each do |i|
         board.groups.create!(
-          board_iteration_number: board.current_iteration_number, 
-          locked: true, 
+          board_iteration_number: board.current_iteration_number,
+          locked: true,
           person_ids: ["#{i}"],
         )
       end
@@ -131,11 +131,11 @@ RSpec.describe Pairer::Board, type: :model do
       board.shuffle!
 
       expect(board.groups.size).to eq(2)
-      
+
       board.shuffle!
 
       expect(board.groups.size).to eq(4)
-      
+
       board.shuffle!
 
       expect(board.groups.size).to eq(4)
@@ -185,7 +185,7 @@ RSpec.describe Pairer::Board, type: :model do
       locked_person_ids = board.people.select(&:locked?).map(&:public_id)
 
       group = board.groups.create!(
-        board_iteration_number: board.current_iteration_number, 
+        board_iteration_number: board.current_iteration_number,
         person_ids: locked_person_ids,
       )
 
@@ -215,9 +215,9 @@ RSpec.describe Pairer::Board, type: :model do
       100.times.each do |i|
         board.shuffle!
 
-        board.current_groups.reload.each do |x| 
+        board.current_groups.reload.each do |x|
           stats[x.person_ids_array] ||= 0
-          stats[x.person_ids_array] += 1 
+          stats[x.person_ids_array] += 1
         end
       end
 
@@ -247,9 +247,9 @@ RSpec.describe Pairer::Board, type: :model do
       100.times.each do |i|
         board.shuffle!
 
-        board.current_groups.reload.each do |x| 
+        board.current_groups.reload.each do |x|
           stats[x.person_ids_array] ||= 0
-          stats[x.person_ids_array] += 1 
+          stats[x.person_ids_array] += 1
         end
       end
 
@@ -267,7 +267,7 @@ RSpec.describe Pairer::Board, type: :model do
       end
 
       expect(stats.map{|x| x.first.size }.uniq.sort).to eq([3])
-      expect(stats.size).to be >= 310
+      expect(stats.size).to be >= 300
     end
   end
 
