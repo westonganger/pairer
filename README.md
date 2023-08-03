@@ -14,7 +14,7 @@ Developed as a Rails engine. So you can add to any existing app or create a bran
 
 ```ruby
 ### Gemfile
-gem 'pairer', git: 'https://github.com/westonganger/pairer'
+gem 'pairer'
 ```
 
 

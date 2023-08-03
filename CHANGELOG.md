@@ -1,5 +1,8 @@
 # CHANGELOG
 
+### v1.0.0
+- Release to Rubygems
+
 ### Apr 1, 2023
 - Move input for "Num Iterations to Track" to be inline with the stats description text
 
