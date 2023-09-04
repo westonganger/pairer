@@ -1,5 +1,6 @@
 # Pairer
 
+<a href="https://badge.fury.io/rb/pairer" target="_blank"><img height="21" style='border:0px;height:21px;' border='0' src="https://badge.fury.io/rb/pairer.svg" alt="Gem Version"></a>
 <a href='https://github.com/westonganger/pairer/actions' target='_blank'><img src="https://github.com/westonganger/pairer/workflows/Tests/badge.svg" style="max-width:100%;" height='21' style='border:0px;height:21px;' border='0' alt="CI Status"></a>
 
 Pairer is a Rails app/engine to help you to easily generate and rotate pairs within a larger group. For example its great for pair programming teams where you want to work with someone new everyday.
