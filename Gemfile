@@ -14,10 +14,12 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
-ENV['DB_GEM'] ||= 'sqlite3'
+def get_env(name)
+  (ENV[name] && !ENV[name].empty?) ? ENV[name] : nil
+end
 
-gem 'rails', ENV["RAILS_VERSION"]
-gem ENV['DB_GEM']
+gem "rails", get_env("RAILS_VERSION")
+gem "sqlite3"
 
 group :development do
   gem "thin"
