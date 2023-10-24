@@ -28,16 +28,6 @@ module Pairer
       end
     end
 
-    initializer "pairer.append_migrations" do |app|
-      ### Automatically load all migrations into main rails app
-      
-      if !app.root.to_s.match?(root.to_s)
-        config.paths["db/migrate"].expanded.each do |expanded_path|
-          app.config.paths["db/migrate"] << expanded_path
-        end
-      end
-    end
-
     initializer "pairer.load_static_assets" do |app|
       ### Expose static assets
       app.middleware.use ::ActionDispatch::Static, "#{root}/public"

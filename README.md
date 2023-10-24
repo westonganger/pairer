@@ -13,11 +13,20 @@ Each organization has many boards. Within each board you can create people and r
 
 Developed as a Rails engine. So you can add to any existing app or create a brand new app with the functionality.
 
+First add the gem to your Gemfile
+
 ```ruby
 ### Gemfile
 gem 'pairer'
 ```
 
+Then install and run the database migrations
+
+```sh
+bundle install
+bundle exec rake pairer:install:migrations
+bundle exec rake db:migrate
+```
 
 #### Option A: Mount to a path
 
