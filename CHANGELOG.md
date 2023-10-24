@@ -1,5 +1,8 @@
 # CHANGELOG
 
+### Unreleased
+- [#3](https://github.com/westonganger/pairer/pull/3) - Do not automatically load migrations and instead require an explicit migration install step
+
 ### v1.0.0
 - Release to Rubygems
 
