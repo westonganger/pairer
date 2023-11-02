@@ -74,13 +74,15 @@ module Pairer
       else
         saved = @board.update(params.require(:board).permit(:name, :password, :group_size, :num_iterations_to_track, roles: []))
       end
-      
+
       if saved
         if params.dig(:board, :password)
           flash.notice = "Password updated."
         else
           flash.notice = "Board updated."
         end
+
+        broadcast_changes
       else
         if @board.errors[:num_iterations_to_track].present?
           flash.alert = "Number of Iterations to Track #{@board.errors[:num_iterations_to_track].first}"
@@ -100,11 +102,16 @@ module Pairer
 
     def shuffle
       @board.shuffle!
+      broadcast_changes
       redirect_to(action: :show)
     end
 
     def create_person
       @person = @board.people.create(name: params[:name])
+
+      if @person.persisted?
+        broadcast_changes
+      end
 
       if request.format.js?
         render
@@ -117,6 +124,7 @@ module Pairer
       @person = @board.people.find_by!(public_id: params.require(:person_id))
 
       @person.toggle!(:locked)
+      broadcast_changes
 
       if request.format.js?
         render
@@ -129,12 +137,14 @@ module Pairer
       @person = @board.people.find_by!(public_id: params.require(:person_id))
 
       @person.destroy!
+      broadcast_changes
 
       redirect_to(action: :show)
     end
 
     def create_group
       @group = @board.groups.create!(board_iteration_number: @board.current_iteration_number)
+      broadcast_changes
 
       if request.format.js?
         render
@@ -147,6 +157,7 @@ module Pairer
       @group = @board.groups.find_by!(public_id: params.require(:group_id))
 
       @group.toggle!(:locked)
+      broadcast_changes
 
       if request.format.js?
         render
@@ -159,6 +170,7 @@ module Pairer
       @group = @board.groups.find_by!(public_id: params.require(:group_id))
 
       @group.destroy!
+      broadcast_changes
 
       if request.format.js?
         render
@@ -175,7 +187,17 @@ module Pairer
         roles: (params[:roles] if params[:roles].present?),
       }.compact
 
+      @group.assign_attributes(attrs)
+
+      if @group.changed?
+        changed = true
+      end
+
       @group.update!(attrs)
+
+      if changed
+        broadcast_changes
+      end
 
       if request.format.js?
         render
@@ -196,6 +218,16 @@ module Pairer
 
     def people_by_id
       @people_by_id ||= @board.people.map{|x| [x.to_param, x] }.to_h
+    end
+
+    def broadcast_changes
+      ActionCable.server.broadcast(
+        "board_#{@board.public_id}",
+        {
+          action: "reload",
+          identifier: session[:pairer_user_id],
+        }
+      )
     end
 
   end

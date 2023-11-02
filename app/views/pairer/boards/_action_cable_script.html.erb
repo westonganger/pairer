@@ -1,0 +1,23 @@
+<% if Rails::VERSION::MAJOR == 5 %>
+  <script src="https://cdn.jsdelivr.net/npm/actioncable@<%= Rails::VERSION::STRING.split(".")[0..2].join(".") %>/lib/assets/compiled/action_cable.min.js"></script>
+<% end %>
+
+<script type="module">
+  <% if Rails::VERSION::MAJOR >= 6 %>
+    import * as ActionCable from "https://cdn.jsdelivr.net/npm/@rails/actioncable@<%= Rails::VERSION::STRING.split(".")[0..2].join(".") %>/+esm";
+  <% end %>
+
+  var consumer = ActionCable.createConsumer();
+
+  var warned = false;
+
+  consumer.subscriptions.create({channel: "Pairer::BoardChannel", id: "<%= @board.public_id %>"}, {
+    received: function(data){
+      if(data.action == "reload" && data.identifier != "<%= session[:pairer_user_id] %>" && !warned){
+        warned = true;
+        alert("The data has been modified since this page was loaded.\n\nPress OK to reload the page.");
+        window.location.reload();
+      }
+    },
+  });
+</script>
