@@ -12,6 +12,7 @@ module Pairer
       elsif request.method == "POST"
         if Pairer.config.allowed_org_ids.include?(params[:org_id]&.downcase)
           session[:pairer_current_org_id] = params[:org_id].downcase
+          session[:pairer_user_id] = "#{session[:pairer_current_org_id]}_#{SecureRandom.uuid}"
           redirect_to boards_path
         end
       end
@@ -23,6 +24,7 @@ module Pairer
       else
         session.delete(:pairer_current_org_id)
         session.delete(:pairer_current_board_id)
+        session.delete(:pairer_user_id)
         flash.notice = "Signed out"
         redirect_to sign_in_path
       end
