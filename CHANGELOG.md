@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ### Unreleased
+- [#14](https://github.com/westonganger/pairer/pull/14) - Remove bootstrap-sprockets and sassc dependency
 - [#12](https://github.com/westonganger/pairer/pull/12) - On boards#show page, if someone else makes changes to the board while you are simultaneously viewing the board, show javascript alert to reload the page. Implemented using ActionCable.
 - [#11](https://github.com/westonganger/pairer/pull/11) - Do not automatically load migrations and instead require an explicit migration install step
 

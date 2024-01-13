@@ -1,7 +1,5 @@
 require 'slim'
-require 'sassc-rails'
-require 'bootstrap-sass'
-require 'bootswatch-rails'
+require "sprockets/railtie"
 require 'hashids'
 
 module Pairer
