@@ -14,11 +14,3 @@ module Pairer
   end
 
 end
-
-if RUBY_VERSION.to_f <= 2.6 && !Array.new.respond_to?(:intersection)
-  Array.class_eval do
-    def intersection(other)
-      self & other
-    end
-  end
-end
