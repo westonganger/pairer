@@ -24,7 +24,6 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "rspec-rails"
-  spec.add_development_dependency "factory_bot"
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "pry-rails"
   spec.add_development_dependency "rails-controller-testing"
