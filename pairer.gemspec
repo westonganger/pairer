@@ -16,7 +16,9 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir["{app,config,db,lib,public}/**/*", "LICENSE", "Rakefile", "README.md"]
 
-  spec.add_dependency "rails", ">= 5.0"
+  spec.required_ruby_version = ">= 2.7"
+
+  spec.add_dependency "rails", ">= 6.0"
   spec.add_dependency "actioncable"
   spec.add_dependency "slim"
   spec.add_dependency "hashids"

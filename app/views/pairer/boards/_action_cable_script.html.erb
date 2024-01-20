@@ -1,11 +1,5 @@
-<% if Rails::VERSION::MAJOR == 5 %>
-  <script src="https://cdn.jsdelivr.net/npm/actioncable@<%= Rails::VERSION::STRING.split(".")[0..2].join(".") %>/lib/assets/compiled/action_cable.min.js"></script>
-<% end %>
-
 <script type="module">
-  <% if Rails::VERSION::MAJOR >= 6 %>
-    import * as ActionCable from "https://cdn.jsdelivr.net/npm/@rails/actioncable@<%= Rails::VERSION::STRING.split(".")[0..2].join(".") %>/+esm";
-  <% end %>
+  import * as ActionCable from "https://cdn.jsdelivr.net/npm/@rails/actioncable@<%= Rails::VERSION::STRING.split(".")[0..2].join(".") %>/+esm";
 
   var consumer = ActionCable.createConsumer();
 
