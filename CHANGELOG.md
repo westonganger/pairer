@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ### Unreleased
+- [#16](https://github.com/westonganger/pairer/pull/16) - Improve board manipulation
 - [#15](https://github.com/westonganger/pairer/pull/15) - Require Rails 6+ and Ruby 2.7+
 - [#14](https://github.com/westonganger/pairer/pull/14) - Remove bootstrap-sprockets and sassc dependency
 - [#12](https://github.com/westonganger/pairer/pull/12) - On boards#show page, if someone else makes changes to the board while you are simultaneously viewing the board, show javascript alert to reload the page. Implemented using ActionCable.

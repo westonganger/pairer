@@ -114,7 +114,7 @@ module Pairer
       end
 
       if request.format.js?
-        render
+        render_js_page_replace
       else
         redirect_to(action: :show)
       end
@@ -127,7 +127,7 @@ module Pairer
       broadcast_changes
 
       if request.format.js?
-        render
+        render_js_page_replace
       else
         redirect_to(action: :show)
       end
@@ -147,7 +147,7 @@ module Pairer
       broadcast_changes
 
       if request.format.js?
-        render
+        render_js_page_replace
       else
         redirect_to(action: :show)
       end
@@ -160,7 +160,7 @@ module Pairer
       broadcast_changes
 
       if request.format.js?
-        render
+        render_js_page_replace
       else
         redirect_to(action: :show)
       end
@@ -173,7 +173,7 @@ module Pairer
       broadcast_changes
 
       if request.format.js?
-        render
+        render_js_page_replace
       else
         redirect_to(action: :show)
       end
@@ -181,6 +181,9 @@ module Pairer
 
     def update_group
       @group = @board.groups.find_by!(public_id: params.require(:group_id))
+
+      person_ids_was = @group.person_ids_array
+      roles_was = @group.roles_array
 
       attrs = {
         person_ids: (params[:person_ids] if params[:person_ids].present?),
@@ -191,16 +194,56 @@ module Pairer
 
       if @group.changed?
         changed = true
-      end
 
-      @group.update!(attrs)
+        ActiveRecord::Base.transaction do
+          @group.save!
 
-      if changed
+          if attrs[:person_ids].present? && @group.person_ids_array.empty?
+            @board.groups.detect do |g|
+              if g.person_ids_array.any?{|person_id| person_ids_was.include?(person_id) }
+                g.person_ids = g.person_ids_array - person_ids_was
+                g.save!
+                true
+              end
+            end
+          elsif attrs[:person_ids].present?
+            @board.groups.detect do |g|
+              next if g.id == @group.id
+
+              if g.person_ids_array.any?{|person_id| @group.person_ids_array.include?(person_id) }
+                g.person_ids = g.person_ids_array - @group.person_ids_array
+                g.save!
+                true
+              end
+            end
+          end
+
+          if attrs[:roles].present? && @group.roles_array.empty?
+            @board.groups.detect do |g|
+              if g.roles_array.any?{|person_id| roles_was.include?(person_id) }
+                g.roles = g.roles_array - roles_was
+                g.save!
+                true
+              end
+            end
+          elsif attrs[:roles].present?
+            @board.groups.detect do |g|
+              next if g.id == @group.id
+
+              if g.roles_array.any?{|role| @group.roles_array.include?(role) }
+                g.roles = g.roles_array - @group.roles_array
+                g.save!
+                true
+              end
+            end
+          end
+        end
+
         broadcast_changes
       end
 
       if request.format.js?
-        render
+        render_js_page_replace
       else
         redirect_to(action: :show)
       end
@@ -228,6 +271,19 @@ module Pairer
           identifier: session[:pairer_user_id],
         }
       )
+    end
+
+    include ActionView::Helpers::JavaScriptHelper
+    def render_js_page_replace
+      @board.reload
+
+      js_page_content = escape_javascript(render_to_string "pairer/boards/show", layout: false)
+
+      javascript = <<~STR
+        $("#page-content").html("#{js_page_content}");
+      STR
+
+      render(js: javascript)
     end
 
   end
