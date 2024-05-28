@@ -55,7 +55,7 @@ module Pairer
       groups.where(board_iteration_number: prev_iteration_number).each do |g|
         if g.locked?
           ### Clone Locked Groups
-          
+
           new_group = g.dup
 
           new_group.assign_attributes(
@@ -70,7 +70,7 @@ module Pairer
           available_roles = (available_roles - new_group.roles_array)
         else
           ### Retain Position of Locked People within Existing Groups
-          
+
           group_locked_person_ids = (g.person_ids_array - available_person_ids)
 
           if group_locked_person_ids.any?
@@ -102,7 +102,7 @@ module Pairer
 
           if available_person_ids.size < num_to_add
             ### Add to group whatever is left
-            
+
             g.person_ids = g.person_ids_array + available_person_ids
 
             available_person_ids = []
@@ -118,13 +118,15 @@ module Pairer
           end
 
           g.person_ids = (g.person_ids_array | chosen_person_ids).sort
+
+          available_person_ids = (available_person_ids - chosen_person_ids)
         end
 
         ### Assign People to New Groups
         while available_person_ids.any? do
           if available_person_ids.size <= self.group_size
             ### Create group using whats left
-            
+
             new_groups << groups.new(
               board_iteration_number: next_iteration_number,
               person_ids: available_person_ids,
@@ -183,7 +185,7 @@ module Pairer
 
       ### Reload groups to fix any issues with caching after creations and deletions
       groups.reload
-        
+
       return true
     end
 
@@ -198,7 +200,7 @@ module Pairer
     end
 
     private
-    
+
     def stats_hash_for_two_pairs
       h = {}
 

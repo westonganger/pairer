@@ -160,7 +160,7 @@ javascript:
         connectWith: ".person-list",
         items: "> .person",
         revert: true,
-        update: function(){
+        receive: function(event, ui){
           var group_id = $(this).data('group-id');
           var prev_person_ids = $(this).data('prev-person-ids');
 
@@ -168,6 +168,26 @@ javascript:
 
           if(!group_id){
             // When on the unassigned list
+
+            if(ui.sender){
+              var group_id = ui.sender.data("group-id");
+              var person_ids = [];
+
+              ui.sender.find('.person').each(function(i, item){
+                person_ids.push($(item).data('person-id'));
+              });
+
+              if(person_ids.length === 0){
+                person_ids.push(""); // to ensure empty array value make the params
+              }
+
+              $.ajax({
+                url: "#{update_group_board_path(@board, format: :js)}",
+                method: "POST",
+                data: {group_id: group_id, person_ids: person_ids},
+              });
+            }
+
             return true; // true only skips ajax update, false cancels the entire item drag/move
           }
 
@@ -177,7 +197,7 @@ javascript:
             person_ids.push($(item).data('person-id'));
           });
 
-          if(equals(prev_person_ids.sort(), person_ids.sort())){
+          if(equals(prev_person_ids.sort(), Array(person_ids).sort())){
             return true; // true only skips ajax update, false cancels the entire item drag/move
           }
 
@@ -189,8 +209,6 @@ javascript:
             url: "#{update_group_board_path(@board, format: :js)}",
             method: "POST",
             data: {group_id: group_id, person_ids: person_ids},
-          }).done(function(){
-            $el.data('prev-person-ids', person_ids);
           });
         },
       });
@@ -199,7 +217,7 @@ javascript:
         connectWith: ".roles-list",
         items: "> .role",
         revert: true,
-        update: function(){
+        receive: function(event, ui){
           var group_id = $(this).data('group-id');
           var prev_roles = $(this).data('prev-roles');
 
@@ -207,6 +225,26 @@ javascript:
 
           if(!group_id){
             // When on the unassigned list
+
+            if(ui.sender){
+              var group_id = ui.sender.data("group-id");
+              var roles = [];
+
+              ui.sender.find('.role').each(function(i, item){
+                roles.push($(item).data('role-name'));
+              });
+
+              if(roles.length === 0){
+                roles.push(""); // to ensure empty array value make the params
+              }
+
+              $.ajax({
+                url: "#{update_group_board_path(@board, format: :js)}",
+                method: "POST",
+                data: {group_id: group_id, roles: roles},
+              });
+            }
+
             return true; // true only skips ajax update, false cancels the entire item drag/move
           }
 
@@ -216,7 +254,7 @@ javascript:
             roles.push($(item).data('role-name'));
           });
 
-          if(equals(prev_roles.sort(), roles.sort())){
+          if(equals(prev_roles.sort(), Array(roles).sort())){
             return true; // true only skips ajax update, false cancels the entire item drag/move
           }
 
@@ -228,8 +266,6 @@ javascript:
             url: "#{update_group_board_path(@board, format: :js)}",
             method: "POST",
             data: {group_id: group_id, roles: roles},
-          }).done(function(){
-            $el.data('prev-roles', roles);
           });
         },
       });

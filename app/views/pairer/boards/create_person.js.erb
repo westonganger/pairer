@@ -1,7 +1,0 @@
-if(<%= raw @person.persisted? %>){
-  $(".unassigned-lists-container .person-list").append("<%= j render 'pairer/boards/person', person: @person %>")
-
-  $("form.new-person-form").find("input","select","textarea").val('')
-}else if(<%= raw @person.errors[:name].present? %>){
-  alert("Name <%= @person.errors[:name].first %>");
-}

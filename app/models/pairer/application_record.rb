@@ -15,5 +15,18 @@ module Pairer
       try(:public_id) || id
     end
 
+    if Rails::VERSION::STRING.to_f < 7
+      def in_order_of(column, order_array)
+        Arel.sql(
+          <<~SQL
+            case #{table_name}.#{column}
+            #{order_array.map_with_index{|x, i| "when '#{x}' then #{i+1}"}.join(" ")}
+            else #{order_array.size+1}
+            end
+          SQL
+        )
+      end
+    end
+
   end
 end

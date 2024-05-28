@@ -1,7 +1,0 @@
-var group_row = $(".group-row[data-group-id=<%= @group.public_id %>]");
-
-$('.unassigned-lists-container .person-list').append(group_row.find(".person"));
-
-$('.unassigned-lists-container .roles-list').append(group_row.find(".role"));
-
-group_row.remove();
