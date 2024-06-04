@@ -154,7 +154,7 @@ module Pairer
     end
 
     def lock_group
-      @group = @board.groups.find_by!(public_id: params.require(:group_id))
+      @group = @board.current_groups.find_by!(public_id: params.require(:group_id))
 
       @group.toggle!(:locked)
       broadcast_changes
@@ -167,7 +167,7 @@ module Pairer
     end
 
     def delete_group
-      @group = @board.groups.find_by!(public_id: params.require(:group_id))
+      @group = @board.current_groups.find_by!(public_id: params.require(:group_id))
 
       @group.destroy!
       broadcast_changes
@@ -180,7 +180,7 @@ module Pairer
     end
 
     def update_group
-      @group = @board.groups.find_by!(public_id: params.require(:group_id))
+      @group = @board.current_groups.find_by!(public_id: params.require(:group_id))
 
       person_ids_was = @group.person_ids_array
       roles_was = @group.roles_array
@@ -192,48 +192,39 @@ module Pairer
 
       @group.assign_attributes(attrs)
 
+      new_person_ids = @group.person_ids_array - person_ids_was
+      new_roles = @group.roles_array - roles_was
+
       if @group.changed?
         changed = true
 
-        ActiveRecord::Base.transaction do
+        if params[:removal] == "true"
           @group.save!
+        else
+          ActiveRecord::Base.transaction do
+            @group.save!
 
-          if attrs[:person_ids].present? && @group.person_ids_array.empty?
-            @board.groups.detect do |g|
-              if g.person_ids_array.any?{|person_id| person_ids_was.include?(person_id) }
-                g.person_ids = g.person_ids_array - person_ids_was
-                g.save!
-                true
+            if new_person_ids.any?
+              @board.current_groups.detect do |g|
+                next if g.id == @group.id
+
+                if g.person_ids_array.intersection(new_person_ids).any?
+                  g.person_ids = g.person_ids_array - @group.person_ids_array
+                  g.save!
+                  true
+                end
               end
             end
-          elsif attrs[:person_ids].present?
-            @board.groups.detect do |g|
-              next if g.id == @group.id
 
-              if g.person_ids_array.any?{|person_id| @group.person_ids_array.include?(person_id) }
-                g.person_ids = g.person_ids_array - @group.person_ids_array
-                g.save!
-                true
-              end
-            end
-          end
+            if new_roles.any?
+              @board.current_groups.detect do |g|
+                next if g.id == @group.id
 
-          if attrs[:roles].present? && @group.roles_array.empty?
-            @board.groups.detect do |g|
-              if g.roles_array.any?{|person_id| roles_was.include?(person_id) }
-                g.roles = g.roles_array - roles_was
-                g.save!
-                true
-              end
-            end
-          elsif attrs[:roles].present?
-            @board.groups.detect do |g|
-              next if g.id == @group.id
-
-              if g.roles_array.any?{|role| @group.roles_array.include?(role) }
-                g.roles = g.roles_array - @group.roles_array
-                g.save!
-                true
+                if g.roles_array.intersection(new_roles).any?
+                  g.roles = g.roles_array - @group.roles_array
+                  g.save!
+                  true
+                end
               end
             end
           end

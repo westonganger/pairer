@@ -184,7 +184,7 @@ javascript:
               $.ajax({
                 url: "#{update_group_board_path(@board, format: :js)}",
                 method: "POST",
-                data: {group_id: group_id, person_ids: person_ids},
+                data: {group_id: group_id, person_ids: person_ids, removal: "true"},
               });
             }
 
