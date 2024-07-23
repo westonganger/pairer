@@ -1,11 +1,11 @@
 # CHANGELOG
 
 ### Unreleased
-- [View Diff](https://github.com/cordova-plugin-camera-preview/cordova-plugin-camera-preview/compare/v1.1.0...master)
+- [View Diff](https://github.com/westonganger/pairer/compare/v1.1.0...master)
 - Nothing yet
 
 ### v1.1.0 - July 23, 2024
-- [View Diff](https://github.com/cordova-plugin-camera-preview/cordova-plugin-camera-preview/compare/v1.0.0...v1.1.0)
+- [View Diff](https://github.com/westonganger/pairer/compare/v1.0.0...v1.1.0)
 - [#16](https://github.com/westonganger/pairer/pull/16) - Improve board manipulation
 - [#15](https://github.com/westonganger/pairer/pull/15) - Require Rails 6+ and Ruby 2.7+
 - [#14](https://github.com/westonganger/pairer/pull/14) - Remove bootstrap-sprockets and sassc dependency
