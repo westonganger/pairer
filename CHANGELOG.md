@@ -1,13 +1,18 @@
 # CHANGELOG
 
 ### Unreleased
+- [View Diff](https://github.com/cordova-plugin-camera-preview/cordova-plugin-camera-preview/compare/v1.1.0...master)
+- Nothing yet
+
+### v1.1.0 - July 23, 2024
+- [View Diff](https://github.com/cordova-plugin-camera-preview/cordova-plugin-camera-preview/compare/v1.0.0...v1.1.0)
 - [#16](https://github.com/westonganger/pairer/pull/16) - Improve board manipulation
 - [#15](https://github.com/westonganger/pairer/pull/15) - Require Rails 6+ and Ruby 2.7+
 - [#14](https://github.com/westonganger/pairer/pull/14) - Remove bootstrap-sprockets and sassc dependency
 - [#12](https://github.com/westonganger/pairer/pull/12) - On boards#show page, if someone else makes changes to the board while you are simultaneously viewing the board, show javascript alert to reload the page. Implemented using ActionCable.
 - [#11](https://github.com/westonganger/pairer/pull/11) - Do not automatically load migrations and instead require an explicit migration install step
 
-### v1.0.0
+### v1.0.0 - Oct 17, 2023
 - Release to Rubygems
 
 ### Apr 1, 2023
