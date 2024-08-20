@@ -20,12 +20,11 @@ end
 
 gem "rails", get_env("RAILS_VERSION")
 
+db_gem = get_env("DB_GEM") || "sqlite3"
+gem db_gem, get_env("DB_GEM_VERSION")
 
 if get_env("RAILS_VERSION").to_f >= 7.2
   gem "activerecord-enhancedsqlite3-adapter"
-  gem "sqlite3", "~> 2.0"
-else
-  gem "sqlite3", "~> 1.7"
 end
 
 group :development do
