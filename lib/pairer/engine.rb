@@ -1,5 +1,4 @@
 require 'slim'
-require "sprockets/railtie"
 require 'hashids'
 
 module Pairer
@@ -7,8 +6,11 @@ module Pairer
     isolate_namespace Pairer
 
     initializer "pairer.assets.precompile" do |app|
+      # this initializer is only called when sprockets is in use
+
       app.config.assets.precompile << "pairer_manifest.js" ### manifest file required
       app.config.assets.precompile << "pairer/favicon.ico"
+      app.config.assets.precompile << "rails-ujs" # provided by activesupport
 
       ### Automatically precompile assets in specified folders
       ["app/assets/images/"].each do |folder|

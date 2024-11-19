@@ -1,5 +1,3 @@
-//= require rails-ujs
-
 window.init = function(){
   $('form').attr('autocomplete', 'off');
 

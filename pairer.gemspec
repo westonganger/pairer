@@ -18,11 +18,10 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.7"
 
-  spec.add_dependency "rails", ">= 6.0"
+  spec.add_dependency "rails", ">= 6.1"
   spec.add_dependency "actioncable"
   spec.add_dependency "slim"
   spec.add_dependency "hashids"
-  spec.add_dependency "sprockets-rails"
 
   spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "rspec-rails"

@@ -2,7 +2,7 @@
 
 ### Unreleased
 - [View Diff](https://github.com/westonganger/pairer/compare/v1.1.0...master)
-- Nothing yet
+- [#17](https://github.com/westonganger/pairer/pull/17) - Remove dependency on Sprockets. Now compatible with both Propshaft and Sprockets.
 
 ### v1.1.0 - July 23, 2024
 - [View Diff](https://github.com/westonganger/pairer/compare/v1.0.0...v1.1.0)
