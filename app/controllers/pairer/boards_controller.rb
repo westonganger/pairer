@@ -247,7 +247,9 @@ module Pairer
         redirect_to(action: :index)
       end
 
-      @board = Pairer::Board.find_by!(org_id: session[:pairer_current_org_id], public_id: params[:id])
+      @board = Pairer::Board
+        .includes(:people, :groups)
+        .find_by!(org_id: session[:pairer_current_org_id], public_id: params[:id])
     end
 
     def people_by_id
@@ -266,7 +268,7 @@ module Pairer
 
     include ActionView::Helpers::JavaScriptHelper
     def render_js_page_replace
-      @board.reload
+      get_board
 
       js_page_content = escape_javascript(render_to_string "pairer/boards/show", layout: false)
 
