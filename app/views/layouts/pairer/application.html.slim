@@ -32,6 +32,9 @@ html
     = javascript_include_tag 'rails-ujs'
     = javascript_include_tag 'pairer/application'
 
+    - if controller.controller_path == "pairer/boards" && controller.action_name == "show"
+      = render "action_cable_script"
+
   body
     nav.navbar.navbar-inverse.navbar-fixed-top
       .container-fluid
