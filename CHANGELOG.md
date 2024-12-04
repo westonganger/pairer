@@ -2,7 +2,7 @@
 
 ### Unreleased
 - [View Diff](https://github.com/westonganger/pairer/compare/v1.2.0...master)
-- Nothing yet
+- [#18](https://github.com/westonganger/pairer/pull/18) - Fix bug with when pressing Lock button which was related to using ActiveRecord#toggle!
 
 ### v1.2.0 - Nov 20, 2024
 - [View Diff](https://github.com/westonganger/pairer/compare/v1.1.0...v1.2.0)

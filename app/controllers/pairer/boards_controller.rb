@@ -123,7 +123,7 @@ module Pairer
     def lock_person
       @person = @board.people.find_by!(public_id: params.require(:person_id))
 
-      @person.toggle!(:locked)
+      @person.update!(locked: params[:lock] == "true")
       broadcast_changes
 
       if request.format.js?
@@ -156,7 +156,7 @@ module Pairer
     def lock_group
       @group = @board.current_groups.find_by!(public_id: params.require(:group_id))
 
-      @group.toggle!(:locked)
+      @person.update!(locked: params[:lock] == "true")
       broadcast_changes
 
       if request.format.js?
