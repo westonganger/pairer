@@ -2,7 +2,7 @@
 
 ### Unreleased
 - [View Diff](https://github.com/westonganger/pairer/compare/v1.2.0...master)
-- Nothing yet
+- [#19](https://github.com/westonganger/pairer/pull/19) - Move render actioncable partial into view layout file to fix issues with 404s and general board bugginess after updating the page content via Javascript (introduced in [#16](https://github.com/westonganger/pairer/pull/16))
 
 ### v1.2.0 - Nov 20, 2024
 - [View Diff](https://github.com/westonganger/pairer/compare/v1.1.0...v1.2.0)
