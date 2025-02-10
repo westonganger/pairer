@@ -2,7 +2,7 @@
 
 ### Unreleased
 - [View Diff](https://github.com/westonganger/pairer/compare/v1.2.1...master)
-- Nothing yet
+- [#21](https://github.com/westonganger/pairer/pull/21) - Fix IOS devices not detecting click events
 
 ### v1.2.1 - Dec 4, 2024
 - [View Diff](https://github.com/westonganger/pairer/compare/v1.2.0...v1.2.1)
