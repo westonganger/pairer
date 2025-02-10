@@ -63,3 +63,11 @@ footer{
     width: initial;
   }
 }
+
+@supports (-webkit-touch-callout: none) {
+  /* IOS DEVICES ONLY */
+
+  * {
+    cursor: pointer !important; /* fix iOS not registering click events, https://stackoverflow.com/questions/24077725/mobile-safari-sometimes-does-not-trigger-the-click-event#comment86597437_39712411 */
+  }
+}
