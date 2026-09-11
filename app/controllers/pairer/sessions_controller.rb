@@ -4,6 +4,11 @@ module Pairer
   class SessionsController < ApplicationController
 
     def sign_in
+      if !request.format.html?
+        head :not_acceptable
+        return
+      end
+
       if request.method == "GET"
         if signed_in?
           redirect_to boards_path

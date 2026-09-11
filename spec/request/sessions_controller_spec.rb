@@ -48,6 +48,20 @@ RSpec.describe Pairer::SessionsController, type: :request do
     expect(response).to redirect_to(pairer.boards_path)
   end
 
+  it "sign_in rejects non-html requests" do
+    get pairer.sign_in_path, params: {format: :json}
+    expect(response.status).to eq(406)
+
+    get pairer.sign_in_path, params: {format: :xml}
+    expect(response.status).to eq(406)
+
+    post pairer.sign_in_path, params: {format: :json}
+    expect(response.status).to eq(406)
+
+    post pairer.sign_in_path, params: {format: :xml}
+    expect(response.status).to eq(406)
+  end
+
   it "sign_out" do
     get pairer.sign_out_path
     expect(response.status).to eq(302)
