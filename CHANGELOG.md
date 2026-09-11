@@ -2,6 +2,7 @@
 
 ### Unreleased
 - [View Diff](https://github.com/westonganger/pairer/compare/v1.2.1...master)
+- [#22](https://github.com/westonganger/pairer/pull/22) - Reject non-html requests on sign_in route
 - [#21](https://github.com/westonganger/pairer/pull/21) - Fix IOS devices not detecting click events
 
 ### v1.2.1 - Dec 4, 2024
